@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Plus, Minus } from "lucide-react";
-import { faqs } from "./data";
+import { faqs } from "./data-faqs";
 
 export function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
@@ -27,14 +27,9 @@ export function FAQ() {
           <div className="lg:col-span-7 flex items-end">
             <p className="text-[#0B1F3A]/70 text-base leading-relaxed">
               Hemos recopilado las preguntas que más recibimos. Si tienes una
-              duda que no está aquí, escríbenos a{" "}
-              <a
-                href="mailto:hola@puertonorte.pe"
-                className="text-[#0B1F3A] border-b border-[#C9A961] hover:text-[#C9A961] transition-colors"
-              >
-                hola@puertonorte.pe
-              </a>{" "}
-              y te respondemos en menos de 24 horas.
+              duda que no está aquí, escríbenos por WhatsApp con el botón verde
+              flotante o cualquier botón de la página. Te respondemos en menos
+              de 5 minutos en horario de atención.
             </p>
           </div>
         </div>

@@ -1,125 +1,246 @@
-import { products } from "./data";
-import { Plus } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { products, buildWhatsAppLink, type Product } from "./data";
+import { MessageCircle, Eye, Ruler, Shirt, Check } from "lucide-react";
+
+function ProductGallery({ product, index }: { product: Product; index: number }) {
+  const [view, setView] = useState<"front" | "back">("front");
+  const [selectedSize, setSelectedSize] = useState<string>("M");
+  const isReversed = index % 2 === 1;
+
+  return (
+    <article
+      id={product.id}
+      className={`grid lg:grid-cols-2 gap-8 lg:gap-16 items-center ${
+        isReversed ? "lg:[direction:rtl]" : ""
+      }`}
+    >
+      {/* Image gallery */}
+      <div className={`lg:[direction:ltr] ${isReversed ? "lg:order-2" : ""}`}>
+        {/* Main view */}
+        <div className="relative aspect-square overflow-hidden bg-[#F5F1EA] border border-[#E5E0D5]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={view === "front" ? product.frontImage : product.backImage}
+            alt={`Polo ${product.name} - vista ${view === "front" ? "frontal" : "trasera"}`}
+            className="w-full h-full object-cover object-center transition-all duration-500"
+            key={view}
+          />
+
+          {/* View label */}
+          <div className="absolute top-4 left-4 bg-[#0B1F3A]/95 backdrop-blur-sm text-[#FAF8F4] px-3 py-1.5 text-[10px] uppercase tracking-wide-luxe font-medium">
+            {view === "front" ? "Frente" : "Espalda"}
+          </div>
+
+          {/* Product number */}
+          <div className="absolute top-4 right-4 bg-[#C9A961] text-[#061425] px-3 py-1.5 text-[10px] uppercase tracking-wide-luxe font-bold">
+            0{index + 1}
+          </div>
+        </div>
+
+        {/* View toggle */}
+        <div className="grid grid-cols-2 gap-3 mt-3">
+          <button
+            onClick={() => setView("front")}
+            className={`relative aspect-[4/3] overflow-hidden border-2 transition-all ${
+              view === "front"
+                ? "border-[#0B1F3A]"
+                : "border-[#E5E0D5] hover:border-[#0B1F3A]/40"
+            }`}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={product.frontImage}
+              alt={`Polo ${product.name} frente thumbnail`}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute bottom-1 left-2 text-[10px] uppercase tracking-wide-luxe font-medium text-[#0B1F3A] bg-white/90 px-1.5 py-0.5">
+              Frente
+            </div>
+          </button>
+          <button
+            onClick={() => setView("back")}
+            className={`relative aspect-[4/3] overflow-hidden border-2 transition-all ${
+              view === "back"
+                ? "border-[#0B1F3A]"
+                : "border-[#E5E0D5] hover:border-[#0B1F3A]/40"
+            }`}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={product.backImage}
+              alt={`Polo ${product.name} espalda thumbnail`}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute bottom-1 left-2 text-[10px] uppercase tracking-wide-luxe font-medium text-[#0B1F3A] bg-white/90 px-1.5 py-0.5">
+              Espalda
+            </div>
+          </button>
+        </div>
+      </div>
+
+      {/* Product info */}
+      <div className={`lg:[direction:ltr] ${isReversed ? "lg:order-1" : ""}`}>
+        {/* Header */}
+        <div className="flex items-baseline justify-between gap-4 mb-2">
+          <h3 className="font-serif text-5xl md:text-6xl text-[#0B1F3A]">
+            {product.name}
+          </h3>
+          <div className="text-right">
+            <div className="text-[10px] uppercase tracking-wide-luxe text-[#0B1F3A]/40">
+              Precio
+            </div>
+            <div className="font-serif text-3xl text-[#0B1F3A]">{product.price}</div>
+          </div>
+        </div>
+
+        <p className="font-serif italic text-[#5B8DBF] text-lg mb-2">
+          {product.tagline}
+        </p>
+
+        {/* Color chip */}
+        <div className="flex items-center gap-2 mb-6">
+          <div
+            className="w-4 h-4 rounded-full border border-[#0B1F3A]/20"
+            style={{ backgroundColor: product.colorHex }}
+          />
+          <span className="text-xs text-[#0B1F3A]/60 uppercase tracking-wide-luxe">
+            {product.colorName}
+          </span>
+          <span className="text-xs text-[#0B1F3A]/40">·</span>
+          <span className="text-xs text-[#0B1F3A]/60 uppercase tracking-wide-luxe">
+            {product.occasion}
+          </span>
+        </div>
+
+        {/* Concept */}
+        <p className="text-sm text-[#0B1F3A]/70 leading-relaxed mb-6">
+          {product.designConcept}
+        </p>
+
+        {/* Design breakdown */}
+        <div className="space-y-3 mb-6 pt-6 border-t border-[#E5E0D5]">
+          <div className="flex items-start gap-3">
+            <Eye className="w-4 h-4 mt-0.5 text-[#C9A961] flex-shrink-0" />
+            <div>
+              <div className="text-[10px] uppercase tracking-wide-luxe text-[#0B1F3A]/40 mb-1">
+                Diseño frente
+              </div>
+              <p className="text-xs text-[#0B1F3A]/80 leading-relaxed">
+                {product.frontDesign}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <Eye className="w-4 h-4 mt-0.5 text-[#C9A961] flex-shrink-0" />
+            <div>
+              <div className="text-[10px] uppercase tracking-wide-luxe text-[#0B1F3A]/40 mb-1">
+                Diseño espalda
+              </div>
+              <p className="text-xs text-[#0B1F3A]/80 leading-relaxed">
+                {product.backDesign}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Specs */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <div className="flex items-start gap-2 p-3 bg-[#F5F1EA]">
+            <Shirt className="w-3.5 h-3.5 mt-0.5 text-[#0B1F3A] flex-shrink-0" />
+            <div>
+              <div className="text-[10px] uppercase tracking-wide-luxe text-[#0B1F3A]/40">
+                Tela
+              </div>
+              <div className="text-xs text-[#0B1F3A] font-medium leading-tight">
+                {product.fabric}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-start gap-2 p-3 bg-[#F5F1EA]">
+            <Ruler className="w-3.5 h-3.5 mt-0.5 text-[#0B1F3A] flex-shrink-0" />
+            <div>
+              <div className="text-[10px] uppercase tracking-wide-luxe text-[#0B1F3A]/40">
+                Corte
+              </div>
+              <div className="text-xs text-[#0B1F3A] font-medium leading-tight">
+                {product.fit}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sizes */}
+        <div className="mb-6">
+          <div className="text-[10px] uppercase tracking-wide-luxe text-[#0B1F3A]/40 mb-2">
+            Tallas disponibles
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {product.sizes.map((size) => (
+              <button
+                key={size}
+                onClick={() => setSelectedSize(size)}
+                className={`w-10 h-10 text-xs font-medium border transition-all ${
+                  selectedSize === size
+                    ? "bg-[#0B1F3A] text-[#FAF8F4] border-[#0B1F3A]"
+                    : "bg-white text-[#0B1F3A] border-[#E5E0D5] hover:border-[#0B1F3A]/40"
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* WhatsApp CTA */}
+        <a
+          href={buildWhatsAppLink(product.id, product.name, product.price)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full inline-flex items-center justify-center gap-3 px-6 py-4 bg-[#25D366] text-[#061425] text-xs uppercase tracking-wide-luxe font-semibold hover:bg-[#1FB855] transition-all duration-300 group"
+        >
+          <MessageCircle className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" />
+          Pedir polo {product.name} · Talla {selectedSize}
+        </a>
+
+        <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-[#0B1F3A]/40">
+          <Check className="w-3 h-3 text-[#25D366]" />
+          <span>Respuesta en 5 min · Pago contra entrega en Lima</span>
+        </div>
+      </div>
+    </article>
+  );
+}
 
 export function Coleccion() {
   return (
-    <section id="coleccion" className="bg-[#FFFFFF] py-24 md:py-36 border-t border-[#E5E0D5]">
+    <section id="coleccion" className="bg-[#FAF8F4] py-20 md:py-32 border-t border-[#E5E0D5]">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-20">
-          <div className="max-w-2xl">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="h-px w-12 bg-[#C9A961]" />
-              <span className="text-xs uppercase tracking-luxe text-[#C9A961] font-medium">
-                La Colección
-              </span>
-            </div>
-            <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-[#0B1F3A] leading-[1.05] text-balance">
-              Tres modelos. <span className="italic font-light text-[#5B8DBF]">Tres ocasiones.</span>
-              <br />
-              Una sola identidad.
-            </h2>
+        <div className="max-w-3xl mb-16 md:mb-24">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-px w-12 bg-[#C9A961]" />
+            <span className="text-xs uppercase tracking-luxe text-[#C9A961] font-medium">
+              La Colección
+            </span>
           </div>
-          <p className="text-[#0B1F3A]/60 text-sm md:text-base max-w-sm leading-relaxed">
-            Cada polo resuelve una necesidad distinta del hincha moderno. Día,
-            noche, reunión. Lo que no cambia es la calidad y el guiño.
+          <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-[#0B1F3A] leading-[1.05] text-balance">
+            Tres modelos.
+            <br />
+            Tres ocasiones. <span className="italic font-light text-[#5B8DBF]">Una identidad.</span>
+          </h2>
+          <p className="mt-6 text-[#0B1F3A]/70 text-base md:text-lg leading-relaxed max-w-xl">
+            Mira cada polo por delante y por detrás. Toca las vistas para
+            alternar. Cuando decidas, pídelo por WhatsApp en un clic.
           </p>
         </div>
 
-        {/* Products grid */}
-        <div className="grid md:grid-cols-3 gap-8 lg:gap-10">
+        {/* Products */}
+        <div className="space-y-20 md:space-y-32">
           {products.map((product, idx) => (
-            <article
-              key={product.id}
-              className="group flex flex-col bg-[#FAF8F4] hover:bg-white transition-all duration-500 border border-[#E5E0D5] hover:border-[#0B1F3A]/30 hover:shadow-2xl hover:shadow-[#0B1F3A]/10"
-            >
-              {/* Image */}
-              <div className="relative aspect-square overflow-hidden bg-[#F5F1EA]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={product.image}
-                  alt={`Polo ${product.name} de Puerto Norte`}
-                  className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute top-4 left-4 bg-[#0B1F3A] text-[#FAF8F4] px-3 py-1.5 text-[10px] uppercase tracking-wide-luxe font-medium">
-                  0{idx + 1}
-                </div>
-                <div className="absolute bottom-4 right-4 bg-[#FAF8F4]/95 backdrop-blur-sm px-3 py-1.5 text-[10px] uppercase tracking-wide-luxe font-medium text-[#0B1F3A]">
-                  {product.price}
-                </div>
-              </div>
-
-              {/* Body */}
-              <div className="flex flex-col flex-1 p-6 lg:p-8">
-                <div className="flex items-baseline justify-between gap-3 mb-1">
-                  <h3 className="font-serif text-3xl text-[#0B1F3A]">
-                    {product.name}
-                  </h3>
-                  <span className="text-[10px] uppercase tracking-wide-luxe text-[#C9A961] font-medium">
-                    {product.occasion.split(",")[0]}
-                  </span>
-                </div>
-                <p className="font-serif italic text-[#5B8DBF] text-base mb-4">
-                  {product.tagline}
-                </p>
-                <p className="text-sm text-[#0B1F3A]/70 leading-relaxed mb-6 flex-1">
-                  {product.description}
-                </p>
-
-                {/* Details */}
-                <ul className="space-y-2 mb-6 pt-6 border-t border-[#E5E0D5]">
-                  {product.details.slice(0, 2).map((d, i) => (
-                    <li
-                      key={i}
-                      className="text-xs text-[#0B1F3A]/60 flex items-start gap-2 leading-relaxed"
-                    >
-                      <Plus className="w-3 h-3 mt-0.5 text-[#C9A961] flex-shrink-0" />
-                      <span>{d}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                {/* Specs */}
-                <div className="grid grid-cols-2 gap-3 mb-6 text-[10px] uppercase tracking-wide-luxe">
-                  <div>
-                    <div className="text-[#0B1F3A]/40 mb-1">Tela</div>
-                    <div className="text-[#0B1F3A] font-medium text-[11px] normal-case tracking-normal">
-                      {product.fabric}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-[#0B1F3A]/40 mb-1">Corte</div>
-                    <div className="text-[#0B1F3A] font-medium text-[11px] normal-case tracking-normal">
-                      {product.fit}
-                    </div>
-                  </div>
-                </div>
-
-                {/* CTA */}
-                <a
-                  href="#preorder"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#0B1F3A] text-[#FAF8F4] text-xs uppercase tracking-wide-luxe font-medium hover:bg-[#061425] transition-all duration-300 group/btn"
-                >
-                  Reservar {product.name}
-                  <Plus className="w-3.5 h-3.5 group-hover/btn:rotate-90 transition-transform duration-500" />
-                </a>
-              </div>
-            </article>
+            <ProductGallery key={product.id} product={product} index={idx} />
           ))}
-        </div>
-
-        {/* Bottom note */}
-        <div className="mt-16 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pt-12 border-t border-[#E5E0D5]">
-          <p className="text-sm text-[#0B1F3A]/60 max-w-md leading-relaxed">
-            Producción de serie corta: cada lote se fabrica una sola vez. Si un
-            modelo se agota, no se repone hasta la siguiente temporada.
-          </p>
-          <a
-            href="#preorder"
-            className="inline-flex items-center gap-2 text-xs uppercase tracking-wide-luxe font-medium text-[#0B1F3A] border-b border-[#0B1F3A] pb-1 hover:text-[#C9A961] hover:border-[#C9A961] transition-colors"
-          >
-            Reservar toda la colección
-          </a>
         </div>
       </div>
     </section>

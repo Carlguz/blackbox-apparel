@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Menu, X, ShoppingBag } from "lucide-react";
+import { Menu, X, MessageCircle } from "lucide-react";
+import { buildGeneralWhatsAppLink } from "./data";
 
 const navItems = [
   { label: "Manifiesto", href: "#manifiesto" },
   { label: "Colección", href: "#coleccion" },
-  { label: "Versatilidad", href: "#versatilidad" },
-  { label: "Detalles", href: "#detalles" },
+  { label: "Cómo comprar", href: "#como-comprar" },
   { label: "FAQ", href: "#faq" },
 ];
 
@@ -41,16 +41,14 @@ export function Header() {
             Puerto
           </span>
           <span
-            className={`font-serif italic text-2xl md:text-3xl font-light transition-colors ${
-              scrolled ? "text-[#C9A961]" : "text-[#C9A961]"
-            }`}
+            className={`font-serif italic text-2xl md:text-3xl font-light transition-colors text-[#C9A961]`}
           >
             Norte
           </span>
         </a>
 
         {/* Desktop nav */}
-        <nav className="hidden lg:flex items-center gap-10">
+        <nav className="hidden lg:flex items-center gap-8">
           {navItems.map((item) => (
             <a
               key={item.href}
@@ -67,15 +65,13 @@ export function Header() {
         {/* CTA + mobile toggle */}
         <div className="flex items-center gap-3">
           <a
-            href="#preorder"
-            className={`hidden md:inline-flex items-center gap-2 px-5 py-2.5 text-xs uppercase tracking-wide-luxe font-medium transition-all duration-300 ${
-              scrolled
-                ? "bg-[#0B1F3A] text-[#FAF8F4] hover:bg-[#061425]"
-                : "bg-white/10 text-white border border-white/30 backdrop-blur-sm hover:bg-white hover:text-[#0B1F3A]"
-            }`}
+            href={buildGeneralWhatsAppLink()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 text-xs uppercase tracking-wide-luxe font-semibold bg-[#25D366] text-[#061425] hover:bg-[#1FB855] transition-all duration-300"
           >
-            <ShoppingBag className="w-3.5 h-3.5" />
-            Reservar
+            <MessageCircle className="w-3.5 h-3.5 fill-current" />
+            Pedir
           </a>
 
           <button
@@ -105,12 +101,14 @@ export function Header() {
               </a>
             ))}
             <a
-              href="#preorder"
+              href={buildGeneralWhatsAppLink()}
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={() => setOpen(false)}
-              className="mt-4 inline-flex items-center justify-center gap-2 px-5 py-3 text-xs uppercase tracking-wide-luxe font-medium bg-[#0B1F3A] text-[#FAF8F4]"
+              className="mt-4 inline-flex items-center justify-center gap-2 px-5 py-3 text-xs uppercase tracking-wide-luxe font-semibold bg-[#25D366] text-[#061425]"
             >
-              <ShoppingBag className="w-3.5 h-3.5" />
-              Reservar ahora
+              <MessageCircle className="w-3.5 h-3.5 fill-current" />
+              Pedir por WhatsApp
             </a>
           </nav>
         </div>

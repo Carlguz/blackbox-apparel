@@ -1,25 +1,19 @@
-import { ArrowDown, Star } from "lucide-react";
+import { ArrowDown, MessageCircle, Star } from "lucide-react";
+import { buildGeneralWhatsAppLink } from "./data";
 
 export function Hero() {
   return (
     <section id="top" className="relative min-h-screen w-full overflow-hidden bg-[#061425]">
-      {/* Background image */}
+      {/* Background image - los 3 polos */}
       <div className="absolute inset-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/products/hero.png"
-          alt="Hombre con polo navy elegante de Puerto Norte"
-          className="w-full h-full object-cover object-center opacity-70"
+          alt="Colección Puerto Norte: tres polos premium"
+          className="w-full h-full object-cover object-center opacity-50"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#061425] via-[#061425]/70 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#061425] via-transparent to-[#061425]/40" />
-      </div>
-
-      {/* Decorative stripes (subtle nod) */}
-      <div className="absolute top-0 right-0 h-full w-32 flex opacity-20 pointer-events-none">
-        <div className="flex-1 bg-[#5B8DBF]" />
-        <div className="flex-1 bg-transparent" />
-        <div className="flex-1 bg-[#5B8DBF]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#061425] via-[#061425]/80 to-[#061425]/40" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#061425] via-transparent to-[#061425]/60" />
       </div>
 
       {/* Content */}
@@ -29,54 +23,66 @@ export function Hero() {
           <div className="flex items-center gap-3 mb-8 animate-fade-in-up" style={{ animationDelay: "0.1s", opacity: 0 }}>
             <div className="h-px w-12 bg-[#C9A961]" />
             <span className="text-xs uppercase tracking-luxe text-[#C9A961] font-medium">
-              Colección Inaugural · 2026
+              Colección 2026 · Producción Gamarra
             </span>
           </div>
 
           {/* Title */}
           <h1
-            className="font-serif text-5xl md:text-7xl lg:text-8xl font-medium text-white leading-[0.95] mb-8 text-balance animate-fade-in-up"
+            className="font-serif text-5xl md:text-7xl lg:text-8xl font-medium text-white leading-[0.95] mb-6 text-balance animate-fade-in-up"
             style={{ animationDelay: "0.25s", opacity: 0 }}
           >
-            Herencia que se
+            Polos que
             <br />
-            lleva <span className="italic text-[#C9A961] font-light">puesto</span>.
+            <span className="italic text-[#C9A961] font-light">dicen sin</span> gritar.
           </h1>
 
           {/* Subtitle */}
           <p
-            className="text-base md:text-lg text-white/80 max-w-xl mb-10 leading-relaxed text-pretty animate-fade-in-up"
+            className="text-base md:text-lg text-white/80 max-w-xl mb-8 leading-relaxed text-pretty animate-fade-in-up"
             style={{ animationDelay: "0.4s", opacity: 0 }}
           >
-            Polos premium inspirados en una identidad centenaria. Tres modelos
-            pensados para el hincha que asiste a la reunión, la cena y el día a
-            día sin renunciar a lo suyo. Elegancia silenciosa para quien ya no
-            necesita camisetas que griten.
+            Tres modelos pensados para el hincha que quiere llevar su identidad
+            a la reunión, la cena y el día a día. Sin camisetas grotescas. Sin
+            gritar lo que se lleva en el alma.
           </p>
+
+          {/* Price line */}
+          <div
+            className="flex items-center gap-3 mb-10 animate-fade-in-up"
+            style={{ animationDelay: "0.5s", opacity: 0 }}
+          >
+            <span className="text-xs uppercase tracking-wide-luxe text-white/50">Desde</span>
+            <span className="font-serif text-3xl text-[#C9A961]">S/ 45</span>
+            <span className="text-xs text-white/40">· Envío Lima 24h</span>
+          </div>
 
           {/* CTAs */}
           <div
-            className="flex flex-col sm:flex-row gap-4 animate-fade-in-up"
+            className="flex flex-col sm:flex-row gap-3 animate-fade-in-up"
             style={{ animationDelay: "0.55s", opacity: 0 }}
           >
             <a
-              href="#coleccion"
-              className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#FAF8F4] text-[#0B1F3A] text-xs uppercase tracking-wide-luxe font-medium hover:bg-[#C9A961] hover:text-[#061425] transition-all duration-300 group"
+              href={buildGeneralWhatsAppLink()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#25D366] text-[#061425] text-xs uppercase tracking-wide-luxe font-semibold hover:bg-[#1FB855] transition-all duration-300 group"
             >
-              Ver la colección
-              <ArrowDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+              <MessageCircle className="w-4 h-4 fill-current" />
+              Pedir por WhatsApp
             </a>
             <a
-              href="#manifiesto"
-              className="inline-flex items-center justify-center gap-3 px-8 py-4 border border-white/40 text-white text-xs uppercase tracking-wide-luxe font-medium hover:bg-white/10 transition-all duration-300"
+              href="#coleccion"
+              className="inline-flex items-center justify-center gap-3 px-8 py-4 border border-white/40 text-white text-xs uppercase tracking-wide-luxe font-medium hover:bg-white/10 transition-all duration-300 group"
             >
-              Conoce el manifiesto
+              Ver los 3 modelos
+              <ArrowDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
             </a>
           </div>
 
           {/* Trust signals */}
           <div
-            className="mt-16 flex flex-wrap items-center gap-x-8 gap-y-4 text-white/60 animate-fade-in-up"
+            className="mt-14 flex flex-wrap items-center gap-x-6 gap-y-3 text-white/60 animate-fade-in-up"
             style={{ animationDelay: "0.7s", opacity: 0 }}
           >
             <div className="flex items-center gap-2">
@@ -86,12 +92,12 @@ export function Hero() {
             <div className="hidden md:block h-px w-8 bg-white/20" />
             <div className="flex items-center gap-2">
               <Star className="w-3.5 h-3.5 text-[#C9A961] fill-[#C9A961]" />
-              <span className="text-xs uppercase tracking-wide-luxe">Producción limitada</span>
+              <span className="text-xs uppercase tracking-wide-luxe">Estampado en Gamarra</span>
             </div>
             <div className="hidden md:block h-px w-8 bg-white/20" />
             <div className="flex items-center gap-2">
               <Star className="w-3.5 h-3.5 text-[#C9A961] fill-[#C9A961]" />
-              <span className="text-xs uppercase tracking-wide-luxe">Hecho en Lima</span>
+              <span className="text-xs uppercase tracking-wide-luxe">Lote limitado</span>
             </div>
           </div>
         </div>

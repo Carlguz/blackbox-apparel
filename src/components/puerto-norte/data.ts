@@ -4,97 +4,94 @@ export type Product = {
   tagline: string;
   occasion: string;
   price: string;
-  image: string;
-  description: string;
-  details: string[];
+  priceNumber: string;
+  frontImage: string;
+  backImage: string;
+  colorName: string;
+  colorHex: string;
+  designConcept: string;
+  frontDesign: string;
+  backDesign: string;
   fabric: string;
   fit: string;
-  colors: string[];
+  sizes: string[];
 };
+
+// WhatsApp number (Peru) — REPLACE with real number when ready
+export const WHATSAPP_NUMBER = "51999888777";
 
 export const products: Product[] = [
   {
     id: "callao",
     name: "Callao",
-    tagline: "Casual elevado, herencia diaria",
-    occasion: "Para el día a día, café, paseo",
-    price: "S/ 89",
-    image: "/products/polo-callao.png",
-    description:
-      "El polo Callao nace del puerto que vio nacer una pasión centenaria. Tejido en algodón pima de gramaje medio, con un bordado discreto del año fundacional en el pecho izquierdo y una franja tenue en la manga. Un guiño que solo quien sabe reconoce, sin gritar lo que se lleva en el alma.",
-    details: [
-      "Bordado '1901' en hilo blanco sobre el pecho izquierdo",
-      "Franja tenue azul cielo en el puño de la manga",
-      "Cuello redondo reforzado con ribete canalé",
-      "Costuras dobles en hombros y cuello",
-    ],
-    fabric: "Algodón Pima peruano 220 g/m²",
-    fit: "Regular fit, caída limpia",
-    colors: ["Azul profundo", "Blanco hueso"],
+    tagline: "Para el día · Café, paseo,周末",
+    occasion: "Casual elevado",
+    price: "S/ 45",
+    priceNumber: "45",
+    frontImage: "/products/callao-front.png",
+    backImage: "/products/callao-back.png",
+    colorName: "Azul profundo",
+    colorHex: "#0B1F3A",
+    designConcept:
+      "Inspirado en el primer puerto del Perú. Bordado discreto en el pecho, tipografía serif elegante en la espalda. Un guiño que solo reconocen los que saben.",
+    frontDesign:
+      "Bordado 'CALLAO' en hilo blanco con estrella ★ sobre el pecho izquierdo. Tamaño 4cm, tipografía serif.",
+    backDesign:
+      "Tipografía serif 'CALLAO' centrada en la espalda alta, en blanco. Líneas finas horizontales arriba y abajo del texto. Tamaño 18cm de ancho.",
+    fabric: "Algodón Pima 24/1 (180 g/m²)",
+    fit: "Regular fit · Cuello redondo reforzado",
+    sizes: ["S", "M", "L", "XL", "XXL"],
   },
   {
     id: "grone",
     name: "Grone",
-    tagline: "Sofisticado, para la noche",
-    occasion: "Para salida, cena, bar",
-    price: "S/ 95",
-    image: "/products/polo-grone.png",
-    description:
-      "El polo Grone está pensado para la noche. Corte slim, algodón blanco de peinado extra, con la palabra 'Grone' en tipografía serif sobre el pecho. Un nombre que se pronuncia al revés, como las claves que solo entiende quien pertenece. Para salir elegante sin renunciar a lo tuyo.",
-    details: [
-      "Tipografía serif 'GRONE' en azul profundo sobre el pecho",
-      "Corte slim, entallado moderno",
-      "Algodón de peinado extra, suavidad sedosa",
-      "Cuello redondo con ribete delgado tono sobre tono",
-    ],
-    fabric: "Algodón Pima peruano peinado 200 g/m²",
-    fit: "Slim fit, entallado",
-    colors: ["Blanco puro", "Azul profundo"],
+    tagline: "Para la noche · Cena, bar, salida",
+    occasion: "Sofisticado",
+    price: "S/ 48",
+    priceNumber: "48",
+    frontImage: "/products/grone-front.png",
+    backImage: "/products/grone-back.png",
+    colorName: "Blanco premium",
+    colorHex: "#FFFFFF",
+    designConcept:
+      "El nombre que se pronuncia al revés, como las claves que solo entiende quien pertenece. Frente limpio con estrella, espalda con tipografía grande.",
+    frontDesign:
+      "Estrella ★ bordada en navy sobre el pecho izquierdo. Tamaño 2cm. Diseño absolutamente minimalista.",
+    backDesign:
+      "Tipografía serif 'GRONE' centrada en la espalda alta, en azul profundo. Línea fina horizontal arriba del texto. Tamaño 22cm de ancho.",
+    fabric: "Algodón Pima 30/1 (170 g/m²) peinado",
+    fit: "Slim fit · Cuello redondo con ribete delgado",
+    sizes: ["S", "M", "L", "XL", "XXL"],
   },
   {
     id: "maute",
     name: "Maute",
-    tagline: "Minimalista premium",
-    occasion: "Para reunión, oficina casual",
-    price: "S/ 109",
-    image: "/products/polo-maute.png",
-    description:
-      "El polo Maute es la pieza más silenciosa de la colección. Algodón navy de gramaje pesado, sin impresión frontal, solo una pequeña estrella bordada en la manga derecha y un acento azul cielo en el interior del cuello. Para quien no necesita mostrar nada para saber lo que es.",
-    details: [
-      "Estrella bordada en hilo plateado sobre manga derecha",
-      "Acento azul cielo en el interior del cuello",
-      "Sin impresión frontal, diseño absolutamente minimalista",
-      "Algodón de gramaje pesado, caída estructurada",
-    ],
-    fabric: "Algodón Pima peruano 240 g/m²",
-    fit: "Modern fit, caída estructurada",
-    colors: ["Azul navy profundo"],
+    tagline: "Para reunión · Oficina casual, cumpleaños",
+    occasion: "Minimalista premium",
+    price: "S/ 52",
+    priceNumber: "52",
+    frontImage: "/products/maute-front.png",
+    backImage: "/products/maute-back.png",
+    colorName: "Crema hueso",
+    colorHex: "#F5F1EA",
+    designConcept:
+      "La pieza más silenciosa de la colección. Sin nada en el frente. Solo una tipografía pequeña en la nuca con la estrella. Para quien no necesita mostrar nada para saber lo que es.",
+    frontDesign:
+      "Frente completamente limpio. Sin impresión, sin bordado, sin decoración. Solo la calidad del algodón y el corte.",
+    backDesign:
+      "Tipografía serif 'MAUTE' pequeña en la nuca (cuello), en navy. Estrella ★ arriba del texto. Tamaño 6cm de ancho.",
+    fabric: "Algodón Pima 24/1 (180 g/m²) — crema natural",
+    fit: "Modern fit · Cuello redondo reforzado",
+    sizes: ["S", "M", "L", "XL", "XXL"],
   },
 ];
 
-export const faqs = [
-  {
-    q: "¿Los polos tienen licencia oficial del club?",
-    a: "No. Puerto Norte es una marca independiente. Inspiramos nuestra identidad en la herencia cultural del hincha, sin usar escudos, logos ni nombres registrados por el club. Trabajamos con guiños estéticos y culturales (años, jerga popular, paleta de colores) que celebran la pertenencia sin violar derechos de imagen.",
-  },
-  {
-    q: "¿Qué tallas están disponibles?",
-    a: "Trabajamos tallas XS a XL en todos los modelos. Cada polo incluye guía de medidas detallada en la ficha de producto. Si dudas entre dos tallas, te recomendamos elegir la mayor: nuestros cortes están pensados para caer con elegancia, no para ajustar como camiseta deportiva.",
-  },
-  {
-    q: "¿Cuál es el tiempo de entrega en Lima?",
-    a: "Los pedidos dentro de Lima Metropolitana se entregan en 24 a 48 horas hábiles. Para provincias, el tiempo estimado es de 3 a 5 días hábiles. Realizamos envíos gratuitos en pedidos superiores a S/ 200.",
-  },
-  {
-    q: "¿Cómo cuido mis polos Puerto Norte?",
-    a: "Lavar a mano o en ciclo delicado con agua fría, usar detergente suave, no usar blanqueador, secar a la sombra tendido horizontalmente, planchar a temperatura media. Con estos cuidados, tus polos mantendrán forma, color y textura por muchas temporadas.",
-  },
-  {
-    q: "¿Puedo devolver un polo si no me convence?",
-    a: "Sí. Tienes 15 días desde la recepción para cambios o devoluciones, siempre que el producto esté sin usar, con etiquetas y en su empaque original. Creemos en prendas que se eligen con calma y se conservan con cariño.",
-  },
-  {
-    q: "¿Hacen ediciones limitadas?",
-    a: "Sí. Cada temporada lanzamos ediciones limitadas con variaciones en color, detalle o colaboración con artistas locales. Suscríbete a nuestro newsletter para acceder en preventa antes que el público general.",
-  },
-];
+export function buildWhatsAppLink(productId: string, productName: string, price: string): string {
+  const message = `¡Hola Puerto Norte! 👋\n\nQuiero pedir el polo *${productName}* (${price}).\n\n¿Me ayudan con tallas y disponibilidad? 🙌`;
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
+export function buildGeneralWhatsAppLink(): string {
+  const message = `¡Hola Puerto Norte! 👋\n\nQuiero más info sobre la colección de polos. 🙌`;
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}

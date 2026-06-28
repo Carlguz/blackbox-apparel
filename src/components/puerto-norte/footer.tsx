@@ -1,6 +1,9 @@
-import { Instagram, Mail, MapPin } from "lucide-react";
+import { Instagram, MessageCircle, MapPin, Clock } from "lucide-react";
+import { buildGeneralWhatsAppLink, WHATSAPP_NUMBER } from "./data";
 
 export function Footer() {
+  const whatsappDisplay = `+51 ${WHATSAPP_NUMBER.slice(2, 4)} ${WHATSAPP_NUMBER.slice(4, 7)} ${WHATSAPP_NUMBER.slice(7)}`;
+
   return (
     <footer className="bg-[#061425] text-[#FAF8F4] pt-20 pb-10 mt-auto">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
@@ -21,6 +24,18 @@ export function Footer() {
               herencia cultural del hincha. Sin escudos, sin nombres
               registrados. Solo esencia. Herencia que se lleva puesto.
             </p>
+
+            {/* WhatsApp big CTA */}
+            <a
+              href={buildGeneralWhatsAppLink()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 px-6 py-3.5 bg-[#25D366] text-[#061425] text-xs uppercase tracking-wide-luxe font-semibold hover:bg-[#1FB855] transition-all duration-300 mb-6"
+            >
+              <MessageCircle className="w-4 h-4 fill-current" />
+              Escríbenos por WhatsApp
+            </a>
+
             <div className="flex items-center gap-3">
               <a
                 href="https://instagram.com"
@@ -30,13 +45,6 @@ export function Footer() {
                 aria-label="Instagram"
               >
                 <Instagram className="w-4 h-4 text-white group-hover:text-[#C9A961] transition-colors" />
-              </a>
-              <a
-                href="mailto:hola@puertonorte.pe"
-                className="w-10 h-10 border border-[#1F3251] hover:border-[#C9A961] flex items-center justify-center transition-colors group"
-                aria-label="Correo"
-              >
-                <Mail className="w-4 h-4 text-white group-hover:text-[#C9A961] transition-colors" />
               </a>
             </div>
           </div>
@@ -50,9 +58,7 @@ export function Footer() {
               {[
                 { label: "Manifiesto", href: "#manifiesto" },
                 { label: "Colección", href: "#coleccion" },
-                { label: "Versatilidad", href: "#versatilidad" },
-                { label: "Detalles", href: "#detalles" },
-                { label: "Preventa", href: "#preorder" },
+                { label: "Cómo comprar", href: "#como-comprar" },
                 { label: "FAQ", href: "#faq" },
               ].map((link) => (
                 <li key={link.href}>
@@ -74,25 +80,19 @@ export function Footer() {
             </h4>
             <ul className="space-y-3">
               <li>
-                <a href="#coleccion" className="text-sm text-white/60 hover:text-[#C9A961] transition-colors">
-                  Polo Callao
+                <a href="#callao" className="text-sm text-white/60 hover:text-[#C9A961] transition-colors">
+                  Polo Callao · S/ 45
                 </a>
               </li>
               <li>
-                <a href="#coleccion" className="text-sm text-white/60 hover:text-[#C9A961] transition-colors">
-                  Polo Grone
+                <a href="#grone" className="text-sm text-white/60 hover:text-[#C9A961] transition-colors">
+                  Polo Grone · S/ 48
                 </a>
               </li>
               <li>
-                <a href="#coleccion" className="text-sm text-white/60 hover:text-[#C9A961] transition-colors">
-                  Polo Maute
+                <a href="#maute" className="text-sm text-white/60 hover:text-[#C9A961] transition-colors">
+                  Polo Maute · S/ 52
                 </a>
-              </li>
-              <li className="pt-2">
-                <span className="text-xs text-white/30">Próximamente</span>
-              </li>
-              <li>
-                <span className="text-sm text-white/40">Edición Otoño 2026</span>
               </li>
             </ul>
           </div>
@@ -104,24 +104,36 @@ export function Footer() {
             </h4>
             <ul className="space-y-4 text-sm text-white/60">
               <li className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 mt-0.5 text-[#5B8DBF] flex-shrink-0" />
-                <span className="leading-relaxed">
-                  Taller en Lima Metropolitana
-                  <br />
-                  <span className="text-white/40">Atención por cita previa</span>
-                </span>
+                <MessageCircle className="w-4 h-4 mt-0.5 text-[#25D366] flex-shrink-0" />
+                <div>
+                  <a
+                    href={buildGeneralWhatsAppLink()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#C9A961] transition-colors block"
+                  >
+                    {whatsappDisplay}
+                  </a>
+                  <span className="text-xs text-white/40">WhatsApp directo</span>
+                </div>
               </li>
               <li className="flex items-start gap-3">
-                <Mail className="w-4 h-4 mt-0.5 text-[#5B8DBF] flex-shrink-0" />
-                <a
-                  href="mailto:hola@puertonorte.pe"
-                  className="hover:text-[#C9A961] transition-colors"
-                >
-                  hola@puertonorte.pe
-                </a>
+                <Clock className="w-4 h-4 mt-0.5 text-[#5B8DBF] flex-shrink-0" />
+                <div>
+                  <span className="leading-relaxed block">
+                    Lun – Sáb · 9am – 8pm
+                  </span>
+                  <span className="text-xs text-white/40">Domingo cerrado</span>
+                </div>
               </li>
-              <li className="pt-2 text-xs text-white/40 leading-relaxed">
-                Respuesta garantizada en menos de 24 horas hábiles.
+              <li className="flex items-start gap-3">
+                <MapPin className="w-4 h-4 mt-0.5 text-[#5B8DBF] flex-shrink-0" />
+                <div>
+                  <span className="leading-relaxed block">
+                    Producción en Gamarra
+                  </span>
+                  <span className="text-xs text-white/40">Envíos a todo el Perú</span>
+                </div>
               </li>
             </ul>
           </div>
