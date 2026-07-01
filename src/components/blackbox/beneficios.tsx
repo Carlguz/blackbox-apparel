@@ -1,28 +1,13 @@
-export function Beneficios() {
-  const benefits = [
-    {
-      icon: "local_shipping",
-      title: "Envíos Rápidos",
-      text: "Entrega en 24-48h en Lima y envíos a todo el Perú.",
-    },
-    {
-      icon: "payments",
-      title: "Facilidad de Pago",
-      text: "Pagos contra entrega, Yape, Plin o transferencia bancaria.",
-    },
-    {
-      icon: "verified",
-      title: "Calidad Superior",
-      text: "Algodón premium con el mejor fit y estructura del mercado.",
-    },
-  ];
+import { type SiteContentData } from "./content";
 
+export function Beneficios({ content }: { content: SiteContentData }) {
+  const { beneficios } = content;
   return (
     <section className="bg-black text-white py-[120px]">
       <div className="max-w-[1440px] mx-auto px-5 md:px-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
-          {benefits.map((b) => (
-            <div key={b.title} className="flex flex-col items-center text-center">
+          {beneficios.map((b) => (
+            <div key={b.id} className="flex flex-col items-center text-center">
               <span className="material-symbols-outlined text-4xl mb-6 font-thin">
                 {b.icon}
               </span>
