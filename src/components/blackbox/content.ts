@@ -50,6 +50,17 @@ export type NotificationsConfig = {
   whatsappBadgeEnabled: boolean;
 };
 
+export type SocialLinks = {
+  instagram: string;
+  tiktok: string;
+  facebook: string;
+  youtube: string;
+  twitter: string; // X
+  linkedin: string;
+  pinterest: string;
+  threads: string;
+};
+
 export type SiteContentData = {
   whatsappNumber: string;
   instagramUrl: string;
@@ -95,6 +106,7 @@ export type SiteContentData = {
     rows: { size: string; chest: string; length: string; waist: string }[];
   };
   notifications: NotificationsConfig;
+  social: SocialLinks;
 };
 
 export const defaultContent: SiteContentData = {
@@ -232,6 +244,16 @@ export const defaultContent: SiteContentData = {
     smtpFrom: "BLACKBOX APPAREL <no-reply@blackbox.pe>",
     emailEnabled: false,
     whatsappBadgeEnabled: true,
+  },
+  social: {
+    instagram: "",
+    tiktok: "",
+    facebook: "",
+    youtube: "",
+    twitter: "",
+    linkedin: "",
+    pinterest: "",
+    threads: "",
   },
 };
 

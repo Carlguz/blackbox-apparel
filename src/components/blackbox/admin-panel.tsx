@@ -193,16 +193,30 @@ export function AdminPanel({
           {tab === "dashboard" && <DashboardTab />}
 
           {tab === "general" && (
-            <div className="space-y-6">
-              <Field label="Número de WhatsApp (con código país, sin +)">
-                <input type="text" value={content.whatsappNumber} onChange={(e) => update("whatsappNumber", e.target.value)} placeholder="51999888777" className="bb-input" />
-              </Field>
-              <Field label="URL de Instagram">
-                <input type="text" value={content.instagramUrl} onChange={(e) => update("instagramUrl", e.target.value)} className="bb-input" />
-              </Field>
-              <Field label="URL de TikTok">
-                <input type="text" value={content.tiktokUrl} onChange={(e) => update("tiktokUrl", e.target.value)} className="bb-input" />
-              </Field>
+            <div className="space-y-8">
+              <div className="space-y-6">
+                <Field label="Número de WhatsApp (con código país, sin +)">
+                  <input type="text" value={content.whatsappNumber} onChange={(e) => update("whatsappNumber", e.target.value)} placeholder="51999888777" className="bb-input" />
+                  <p className="text-xs text-[#666] mt-2">
+                    Ejemplo: 51 + 999888777. Este número aparece en los botones de WhatsApp que ven los clientes.
+                  </p>
+                </Field>
+              </div>
+
+              {/* Redes sociales */}
+              <div className="bg-white p-6 border border-[#c4c7c7] space-y-4">
+                <div>
+                  <h4 className="font-bold text-black mb-1">Redes Sociales</h4>
+                  <p className="text-sm text-[#666]">
+                    Pega los links completos de tus perfiles. Solo se mostrarán en la web las redes que tengan URL.
+                    Cuando un visitante haga clic en un icono, lo llevará a tu perfil.
+                  </p>
+                </div>
+                <SocialEditor
+                  social={content.social}
+                  onChange={(social) => update("social", social)}
+                />
+              </div>
             </div>
           )}
 
@@ -756,6 +770,104 @@ const ORDER_STATUSES: { value: OrderStatus; label: string; color: string }[] = [
   { value: "delivered", label: "Entregado", color: "#2ECC71" },
   { value: "cancelled", label: "Cancelado", color: "#ba1a1a" },
 ];
+
+// ─── Social Editor (inside General tab) ──────────────────────────────
+function SocialEditor({
+  social,
+  onChange,
+}: {
+  social: import("./content").SocialLinks;
+  onChange: (s: import("./content").SocialLinks) => void;
+}) {
+  const networks: { key: keyof typeof social; label: string; icon: string; placeholder: string; color: string }[] = [
+    { key: "instagram", label: "Instagram", icon: "photo_camera", placeholder: "https://instagram.com/tu_usuario", color: "#E4405F" },
+    { key: "tiktok", label: "TikTok", icon: "music_note", placeholder: "https://tiktok.com/@tu_usuario", color: "#000000" },
+    { key: "facebook", label: "Facebook", icon: "groups", placeholder: "https://facebook.com/tu_pagina", color: "#1877F2" },
+    { key: "youtube", label: "YouTube", icon: "smart_display", placeholder: "https://youtube.com/@tu_canal", color: "#FF0000" },
+    { key: "twitter", label: "X (Twitter)", icon: "close", placeholder: "https://x.com/tu_usuario", color: "#000000" },
+    { key: "linkedin", label: "LinkedIn", icon: "work", placeholder: "https://linkedin.com/company/tu_empresa", color: "#0A66C2" },
+    { key: "pinterest", label: "Pinterest", icon: "push_pin", placeholder: "https://pinterest.com/tu_usuario", color: "#BD081C" },
+    { key: "threads", label: "Threads", icon: "alternate_email", placeholder: "https://threads.net/@tu_usuario", color: "#000000" },
+  ];
+
+  const setField = (key: keyof typeof social, value: string) => {
+    onChange({ ...social, [key]: value });
+  };
+
+  const activeCount = networks.filter((n) => social[n.key]?.trim()).length;
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-[#666]">
+          <strong className="text-black">{activeCount}</strong> de {networks.length} redes activas
+        </p>
+        <button
+          onClick={() => {
+            if (confirm("¿Borrar todas las URLs de redes sociales?")) {
+              onChange({
+                instagram: "", tiktok: "", facebook: "", youtube: "",
+                twitter: "", linkedin: "", pinterest: "", threads: "",
+              });
+            }
+          }}
+          className="text-xs text-red-600 hover:text-red-800 uppercase tracking-wide"
+        >
+          Borrar todo
+        </button>
+      </div>
+      <div className="space-y-3">
+        {networks.map((n) => {
+          const value = social[n.key] || "";
+          const isActive = value.trim().length > 0;
+          return (
+            <div key={n.key} className="space-y-1.5">
+              <label className="flex items-center justify-between">
+                <span className="flex items-center gap-2 text-label-caps text-[#444748] uppercase">
+                  <span
+                    className="material-symbols-outlined text-base"
+                    style={{ color: isActive ? n.color : "#999" }}
+                  >
+                    {n.icon}
+                  </span>
+                  {n.label}
+                  {isActive && (
+                    <span className="w-2 h-2 rounded-full bg-[#25D366]" title="Activa" />
+                  )}
+                </span>
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  value={value}
+                  onChange={(e) => setField(n.key, e.target.value)}
+                  placeholder={n.placeholder}
+                  className="bb-input flex-1"
+                />
+                {isActive && (
+                  <a
+                    href={value}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-2 border border-[#c4c7c7] hover:border-black hover:bg-black hover:text-white transition-colors flex items-center"
+                    title="Abrir enlace"
+                  >
+                    <span className="material-symbols-outlined text-base">open_in_new</span>
+                  </a>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="pt-3 border-t border-[#c4c7c7]">
+        <p className="text-xs text-[#666]">
+          💡 Los iconos aparecerán automáticamente en el footer cuando tengan URL. Las que dejes vacías no se muestran.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 type OrderRow = {
   id: string;
