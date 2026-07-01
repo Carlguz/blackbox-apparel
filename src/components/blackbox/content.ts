@@ -145,3 +145,50 @@ export function buildWhatsAppLink(
   }
   return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 }
+
+/**
+ * Creates a pending order in the database when a user clicks a WhatsApp CTA.
+ * Fire-and-forget — never blocks the link opening.
+ */
+export async function trackOrderClick(opts: {
+  productId: string;
+  productName: string;
+  productPrice: string;
+  size?: string;
+}): Promise<void> {
+  try {
+    await fetch("/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        customerPhone: "pending", // placeholder, filled when WhatsApp contact happens
+        customerName: null,
+        productId: opts.productId,
+        productName: opts.productName,
+        productPrice: opts.productPrice,
+        size: opts.size,
+        notes: "Pedido iniciado desde landing (clic en WhatsApp)",
+      }),
+    });
+  } catch (e) {
+    // Silent fail — never block the user
+    console.warn("trackOrderClick failed:", e);
+  }
+}
+
+/**
+ * Wraps a WhatsApp link with order tracking.
+ * Returns the WhatsApp URL and triggers a background order creation.
+ */
+export function buildWhatsAppLinkWithTracking(
+  whatsappNumber: string,
+  productId?: string,
+  productName?: string,
+  price?: string,
+  size?: string
+): string {
+  if (productId && productName && price) {
+    void trackOrderClick({ productId, productName, productPrice: price, size });
+  }
+  return buildWhatsAppLink(whatsappNumber, productId, productName, price);
+}

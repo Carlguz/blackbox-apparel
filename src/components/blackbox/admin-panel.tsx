@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { type SiteContentData, type EditableProduct, type EditableBenefit } from "./content";
 
-type Tab = "general" | "hero" | "filosofia" | "coleccion" | "productos" | "beneficios" | "modelo" | "cta" | "footer";
+type Tab = "general" | "hero" | "filosofia" | "coleccion" | "productos" | "beneficios" | "modelo" | "cta" | "footer" | "pedidos";
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: "general", label: "General", icon: "settings" },
@@ -15,6 +15,7 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: "modelo", label: "Galería", icon: "image" },
   { id: "cta", label: "CTA Final", icon: "campaign" },
   { id: "footer", label: "Footer", icon: "dock_to_bottom" },
+  { id: "pedidos", label: "Pedidos", icon: "shopping_bag" },
 ];
 
 const MATERIAL_ICONS = [
@@ -22,6 +23,29 @@ const MATERIAL_ICONS = [
   "chat", "favorite", "star", "security", "eco", "diamond", "workspace_premium",
   "auto_awesome", "bolt", "trending_up", "savings", "credit_card", "support_agent",
 ];
+
+type OrderStatus = "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
+const ORDER_STATUSES: { value: OrderStatus; label: string; color: string }[] = [
+  { value: "pending", label: "Pendiente", color: "#a9a9a9" },
+  { value: "confirmed", label: "Confirmado", color: "#1F3C88" },
+  { value: "shipped", label: "Enviado", color: "#C9A961" },
+  { value: "delivered", label: "Entregado", color: "#2ECC71" },
+  { value: "cancelled", label: "Cancelado", color: "#ba1a1a" },
+];
+
+type OrderRow = {
+  id: string;
+  customer_name: string | null;
+  customer_phone: string;
+  product_name: string;
+  product_price: string;
+  size: string | null;
+  quantity: number;
+  status: OrderStatus;
+  total: string;
+  notes: string | null;
+  created_at: string;
+};
 
 export function AdminPanel({
   content,
@@ -40,7 +64,6 @@ export function AdminPanel({
   const [savedFlash, setSavedFlash] = useState(false);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
-  // Helper to update nested content
   const update = <K extends keyof SiteContentData>(key: K, value: SiteContentData[K]) => {
     setContent({ ...content, [key]: value });
   };
@@ -53,7 +76,6 @@ export function AdminPanel({
     }
   };
 
-  // Image upload handler
   const uploadImage = async (file: File, target: "hero" | `product-${string}` | `modelo-grande` | `modelo-peq1` | `modelo-peq2`) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -81,7 +103,6 @@ export function AdminPanel({
     }
   };
 
-  // Product helpers
   const addProduct = () => {
     const newId = String(Date.now()).slice(-6);
     const newProduct: EditableProduct = {
@@ -101,11 +122,9 @@ export function AdminPanel({
     update("products", content.products.map((p) => (p.id === id ? { ...p, ...patch } : p)));
   };
 
-  // Benefit helpers
   const addBenefit = () => {
-    const newId = "b" + Date.now();
     const newBenefit: EditableBenefit = {
-      id: newId,
+      id: "b" + Date.now(),
       icon: "star",
       title: "Nuevo Beneficio",
       text: "Descripción del beneficio.",
@@ -121,7 +140,6 @@ export function AdminPanel({
 
   return (
     <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-stretch animate-fade-in">
-      {/* Sidebar */}
       <aside className="w-64 bg-[#1a1c1c] text-white flex flex-col flex-shrink-0">
         <div className="p-6 border-b border-white/10">
           <div className="text-label-caps text-white/40 uppercase tracking-[0.2em] mb-1">Admin Panel</div>
@@ -160,20 +178,19 @@ export function AdminPanel({
         </div>
       </aside>
 
-      {/* Main content */}
       <main className="flex-1 bg-[#f9f9f9] overflow-y-auto">
         <div className="max-w-3xl mx-auto px-8 py-10">
-          {/* Tab title */}
           <div className="mb-8 pb-6 border-b border-[#c4c7c7]">
             <h2 className="text-headline-xl text-black">
               {TABS.find((t) => t.id === tab)?.label}
             </h2>
             <p className="text-body-md text-[#444748] mt-1">
-              Edita los campos y guarda los cambios al final.
+              {tab === "pedidos"
+                ? "Pedidos generados cuando un cliente hace clic en WhatsApp."
+                : "Edita los campos y guarda los cambios al final."}
             </p>
           </div>
 
-          {/* GENERAL */}
           {tab === "general" && (
             <div className="space-y-6">
               <Field label="Número de WhatsApp (con código país, sin +)">
@@ -191,7 +208,6 @@ export function AdminPanel({
             </div>
           )}
 
-          {/* HERO */}
           {tab === "hero" && (
             <div className="space-y-6">
               <Field label="Título línea 1">
@@ -217,7 +233,6 @@ export function AdminPanel({
             </div>
           )}
 
-          {/* FILOSOFIA */}
           {tab === "filosofia" && (
             <div className="space-y-6">
               <Field label="Etiqueta (uppercase)">
@@ -229,7 +244,6 @@ export function AdminPanel({
             </div>
           )}
 
-          {/* COLECCION */}
           {tab === "coleccion" && (
             <div className="space-y-6">
               <Field label="Título de la colección">
@@ -241,17 +255,13 @@ export function AdminPanel({
             </div>
           )}
 
-          {/* PRODUCTOS */}
           {tab === "productos" && (
             <div className="space-y-8">
               {content.products.map((p, idx) => (
                 <div key={p.id} className="bg-white p-6 border border-[#c4c7c7] space-y-4">
                   <div className="flex items-center justify-between">
                     <h4 className="font-bold text-black">Producto {idx + 1}</h4>
-                    <button
-                      onClick={() => removeProduct(p.id)}
-                      className="text-sm text-red-600 hover:text-red-800"
-                    >
+                    <button onClick={() => removeProduct(p.id)} className="text-sm text-red-600 hover:text-red-800">
                       Eliminar
                     </button>
                   </div>
@@ -279,16 +289,12 @@ export function AdminPanel({
                   </Field>
                 </div>
               ))}
-              <button
-                onClick={addProduct}
-                className="w-full py-4 border-2 border-dashed border-[#c4c7c7] text-[#444748] hover:border-black hover:text-black transition-colors text-button uppercase"
-              >
+              <button onClick={addProduct} className="w-full py-4 border-2 border-dashed border-[#c4c7c7] text-[#444748] hover:border-black hover:text-black transition-colors text-button uppercase">
                 + Agregar producto
               </button>
             </div>
           )}
 
-          {/* BENEFICIOS */}
           {tab === "beneficios" && (
             <div className="space-y-6">
               {content.beneficios.map((b, idx) => (
@@ -306,11 +312,7 @@ export function AdminPanel({
                     <textarea value={b.text} onChange={(e) => updateBenefit(b.id, { text: e.target.value })} className="bb-input min-h-[60px]" />
                   </Field>
                   <Field label="Icono (Material Symbol)">
-                    <select
-                      value={b.icon}
-                      onChange={(e) => updateBenefit(b.id, { icon: e.target.value })}
-                      className="bb-input"
-                    >
+                    <select value={b.icon} onChange={(e) => updateBenefit(b.id, { icon: e.target.value })} className="bb-input">
                       {MATERIAL_ICONS.map((ic) => (
                         <option key={ic} value={ic}>{ic}</option>
                       ))}
@@ -322,16 +324,12 @@ export function AdminPanel({
                   </Field>
                 </div>
               ))}
-              <button
-                onClick={addBenefit}
-                className="w-full py-4 border-2 border-dashed border-[#c4c7c7] text-[#444748] hover:border-black hover:text-black transition-colors text-button uppercase"
-              >
+              <button onClick={addBenefit} className="w-full py-4 border-2 border-dashed border-[#c4c7c7] text-[#444748] hover:border-black hover:text-black transition-colors text-button uppercase">
                 + Agregar beneficio
               </button>
             </div>
           )}
 
-          {/* MODELO (Galería) */}
           {tab === "modelo" && (
             <div className="space-y-6">
               <Field label="Imagen grande (calle)">
@@ -361,7 +359,6 @@ export function AdminPanel({
             </div>
           )}
 
-          {/* CTA */}
           {tab === "cta" && (
             <div className="space-y-6">
               <Field label="Título">
@@ -376,7 +373,6 @@ export function AdminPanel({
             </div>
           )}
 
-          {/* FOOTER */}
           {tab === "footer" && (
             <div className="space-y-6">
               <Field label="Texto de copyright">
@@ -384,10 +380,11 @@ export function AdminPanel({
               </Field>
             </div>
           )}
+
+          {tab === "pedidos" && <OrdersTab />}
         </div>
       </main>
 
-      {/* Inline styles for inputs (using a style tag to keep things simple) */}
       <style>{`
         .bb-input {
           width: 100%;
@@ -400,10 +397,163 @@ export function AdminPanel({
           outline: none;
           transition: border-color 0.2s;
         }
-        .bb-input:focus {
-          border-color: #000000;
-        }
+        .bb-input:focus { border-color: #000000; }
       `}</style>
+    </div>
+  );
+}
+
+// ─── Orders Tab ───────────────────────────────────────────────────────
+function OrdersTab() {
+  const [orders, setOrders] = useState<OrderRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<OrderStatus | "all">("all");
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const url = filter === "all" ? "/api/orders" : `/api/orders?status=${filter}`;
+      const res = await fetch(url, { cache: "no-store" });
+      const json = await res.json();
+      setOrders(json.orders || []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, [filter]);
+
+  const updateStatus = async (id: string, status: OrderStatus) => {
+    try {
+      await fetch(`/api/orders/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      load();
+    } catch (e) {
+      alert("Error al actualizar: " + (e as Error).message);
+    }
+  };
+
+  const deleteOrder = async (id: string) => {
+    if (!confirm("¿Eliminar este pedido?")) return;
+    try {
+      await fetch(`/api/orders/${id}`, { method: "DELETE" });
+      load();
+    } catch (e) {
+      alert("Error al eliminar: " + (e as Error).message);
+    }
+  };
+
+  const fmtDate = (s: string) => {
+    try {
+      return new Date(s).toLocaleString("es-PE", {
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return s;
+    }
+  };
+
+  if (loading) {
+    return <div className="text-body-md text-[#444748]">Cargando pedidos...</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Filtros */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => setFilter("all")}
+          className={`px-4 py-2 text-button uppercase ${filter === "all" ? "bg-black text-white" : "bg-white border border-[#c4c7c7] text-black hover:border-black"}`}
+        >
+          Todos ({orders.length})
+        </button>
+        {ORDER_STATUSES.map((s) => (
+          <button
+            key={s.value}
+            onClick={() => setFilter(s.value)}
+            className={`px-4 py-2 text-button uppercase ${filter === s.value ? "bg-black text-white" : "bg-white border border-[#c4c7c7] text-black hover:border-black"}`}
+          >
+            {s.label}
+          </button>
+        ))}
+        <button
+          onClick={load}
+          className="ml-auto px-4 py-2 text-button uppercase bg-[#25D366] text-white hover:bg-[#1FB855]"
+        >
+          <span className="material-symbols-outlined text-sm align-middle">refresh</span>{" "}
+          Refrescar
+        </button>
+      </div>
+
+      {/* Lista */}
+      {orders.length === 0 ? (
+        <div className="bg-white p-8 border border-[#c4c7c7] text-center text-body-md text-[#444748]">
+          No hay pedidos aún. Cuando alguien haga clic en un botón de WhatsApp en la landing, aparecerá aquí.
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {orders.map((o) => {
+            const statusMeta = ORDER_STATUSES.find((s) => s.value === o.status) || ORDER_STATUSES[0];
+            return (
+              <div key={o.id} className="bg-white p-5 border border-[#c4c7c7]">
+                <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span
+                        className="text-label-caps px-2 py-0.5 uppercase"
+                        style={{ backgroundColor: statusMeta.color, color: "white" }}
+                      >
+                        {statusMeta.label}
+                      </span>
+                      <span className="text-label-caps text-[#666]">{fmtDate(o.created_at)}</span>
+                    </div>
+                    <div className="text-body-md font-medium text-black">
+                      {o.product_name} × {o.quantity}
+                      {o.size && <span className="text-[#666]"> · Talla {o.size}</span>}
+                    </div>
+                    <div className="text-body-md text-[#444748] mt-1">
+                      {o.customer_name || "Cliente desconocido"} · {o.customer_phone}
+                    </div>
+                    {o.notes && (
+                      <div className="text-sm text-[#666] mt-1 italic">{o.notes}</div>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <div className="text-headline-lg text-black">{o.total}</div>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2 pt-3 border-t border-[#c4c7c7]">
+                  {ORDER_STATUSES.map((s) => (
+                    <button
+                      key={s.value}
+                      onClick={() => updateStatus(o.id, s.value)}
+                      className={`px-3 py-1.5 text-label-caps uppercase ${o.status === s.value ? "bg-black text-white" : "bg-[#f3f3f3] text-black hover:bg-[#e8e8e8]"}`}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => deleteOrder(o.id)}
+                    className="ml-auto px-3 py-1.5 text-label-caps uppercase text-red-600 hover:bg-red-50"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -430,12 +580,10 @@ function ImagePicker({
 }) {
   return (
     <div className="space-y-3">
-      {/* Preview */}
       <div className="w-full aspect-[3/4] max-w-[200px] bg-[#eeeeee] overflow-hidden border border-[#c4c7c7]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={url} alt="Preview" className="w-full h-full object-cover" />
       </div>
-      {/* URL input */}
       <input
         type="text"
         value={url}
@@ -443,7 +591,6 @@ function ImagePicker({
         placeholder="/products/imagen.png o https://..."
         className="bb-input"
       />
-      {/* Upload button */}
       <input
         type="file"
         accept="image/*"

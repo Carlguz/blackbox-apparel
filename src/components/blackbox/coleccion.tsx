@@ -1,4 +1,4 @@
-import { type SiteContentData, buildWhatsAppLink } from "./content";
+import { type SiteContentData, buildWhatsAppLinkWithTracking } from "./content";
 
 export function Coleccion({ content }: { content: SiteContentData }) {
   const { coleccion, products, whatsappNumber } = content;
@@ -22,7 +22,7 @@ export function Coleccion({ content }: { content: SiteContentData }) {
               />
               <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                 <a
-                  href={buildWhatsAppLink(whatsappNumber, product.id, product.name, product.price)}
+                  href={buildWhatsAppLinkWithTracking(whatsappNumber, product.id, product.name, product.price)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block w-full bg-black text-white py-4 text-button uppercase text-center hover:bg-[#25D366] transition-colors"
