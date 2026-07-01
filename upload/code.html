@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BLACKBOX APPAREL | Esenciales Premium</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e2e2e2",
+                        "secondary-fixed-dim": "#abcdcc",
+                        "tertiary-fixed-dim": "#3de273",
+                        "secondary-fixed": "#c7e9e8",
+                        "inverse-surface": "#2f3131",
+                        "outline": "#747878",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-secondary-fixed-variant": "#2d4c4c",
+                        "on-background": "#1a1c1c",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#002109",
+                        "on-surface-variant": "#444748",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-container": "#1c1b1b",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#c4c7c7",
+                        "surface-dim": "#dadada",
+                        "on-primary-fixed-variant": "#474646",
+                        "surface-tint": "#5f5e5e",
+                        "secondary": "#446464",
+                        "secondary-container": "#c4e6e6",
+                        "inverse-on-surface": "#f1f1f1",
+                        "on-tertiary-fixed": "#002109",
+                        "on-tertiary-container": "#009844",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#66ff8e",
+                        "inverse-primary": "#c8c6c5",
+                        "surface-container-high": "#e8e8e8",
+                        "surface": "#f9f9f9",
+                        "surface-container": "#eeeeee",
+                        "on-secondary-fixed": "#002020",
+                        "background": "#f9f9f9",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#496868",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "primary-fixed": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#005322",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "on-primary-fixed": "#1c1b1b",
+                        "surface-container-low": "#f3f3f3",
+                        "primary": "#000000",
+                        "on-primary-container": "#858383",
+                        "on-tertiary": "#ffffff",
+                        "tertiary": "#000000",
+                        "surface-bright": "#f9f9f9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "section-gap": "120px",
+                        "margin-mobile": "20px",
+                        "unit": "4px",
+                        "margin-desktop": "48px",
+                        "gutter-desktop": "24px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "button": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-xl": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "button": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "display-lg": ["64px", {"lineHeight": "72px", "letterSpacing": "-0.04em", "fontWeight": "600"}],
+                        "display-lg-mobile": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.03em", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                        "headline-xl": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #f9f9f9;
+            color: #1a1c1c;
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .product-card-hover:hover .product-cta {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="antialiased">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 h-20">
+<div class="flex justify-between items-center px-margin-desktop h-full max-w-container-max mx-auto">
+<div class="font-headline-xl text-headline-xl font-bold tracking-tighter text-primary">BLACKBOX APPAREL</div>
+<nav class="hidden md:flex gap-8">
+<a class="font-button text-button uppercase text-primary border-b-2 border-primary pb-1" href="#">Colección</a>
+<a class="font-button text-button uppercase text-on-surface-variant hover:text-primary transition-colors" href="#">Nuestra Historia</a>
+<a class="font-button text-button uppercase text-on-surface-variant hover:text-primary transition-colors" href="#">WhatsApp</a>
+</nav>
+<div class="flex items-center gap-6">
+<button class="hover:opacity-70 transition-opacity">
+<span class="material-symbols-outlined">shopping_bag</span>
+</button>
+<button class="hover:opacity-70 transition-opacity">
+<span class="material-symbols-outlined">person</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-20">
+<!-- Hero Section -->
+<section class="relative h-[921px] w-full overflow-hidden flex items-center">
+<div class="absolute inset-0 z-0">
+<div class="bg-cover bg-center w-full h-full transform scale-105" data-alt="A cinematic, high-fashion editorial portrait of a masculine model wearing a crisp black minimalist polo shirt. The model stands against a clean, architectural urban background with soft afternoon lighting casting long shadows. The overall aesthetic is disciplined, expensive, and modern, echoing a Zara or COS campaign style with a focus on textile quality and sharp silhouettes." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDYxZOQfkGlRuZgcKoCiEKHp5UgZZysXU1c5RPZeAvivduzn8FtwMQ2Hv1djGpqDLwfJvxt3UHZIhfpqpZ2ezpMPwaxNQVRNvG_Y-u_g6dDem9c-Ql1R0H5SmQco6YYg0F3nZsXRRtJCpbtf5Iig5SSvFSJPc87_JSrl9u3W1etLgOX2BNxu1Yu-8kCUh5LoZ08Cxr2tkACwPYd3Qt9ntTnPfhCqmRsaZ9_goFGlFgePBXn-BC0PMpUe-IRYUQl-Ahnk803bMdbD6E')"></div>
+<div class="absolute inset-0 bg-black/10"></div>
+</div>
+<div class="relative z-10 px-margin-desktop max-w-container-max mx-auto w-full">
+<div class="max-w-2xl">
+<h1 class="font-display-lg text-display-lg text-white mb-6 leading-none">No vendemos ropa.<br/>Construimos presencia.</h1>
+<p class="font-body-lg text-body-lg text-white/90 mb-10 max-w-lg">Polos premium diseñados en Perú para potenciar tu estilo, confianza y fit diario.</p>
+<a class="inline-flex items-center gap-3 bg-[#25D366] text-white px-10 py-5 font-button text-button uppercase tracking-wider transition-transform active:scale-95 shadow-xl" href="https://wa.me/#">COMPRAR POR WHATSAPP</a>
+</div>
+</div>
+</section>
+<!-- Identity Section -->
+<section class="py-section-gap bg-white border-b border-outline-variant/10">
+<div class="max-w-container-max mx-auto px-margin-desktop text-center">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant mb-8 uppercase tracking-[0.3em]">Nuestra Filosofía</h2>
+<div class="max-w-4xl mx-auto">
+<p class="font-headline-xl text-headline-xl text-primary leading-tight font-light italic">"Vestir bien no es un lujo. Es una estrategia."</p>
+</div>
+</div>
+</section>
+<!-- Product Grid -->
+<section class="py-section-gap px-margin-desktop max-w-container-max mx-auto">
+<div class="flex justify-between items-end mb-16">
+<div>
+<h3 class="font-headline-xl text-headline-xl text-primary">Colección 001</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">La base de cualquier armario sofisticado.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter-desktop">
+<!-- Product 1 -->
+<div class="group">
+<div class="aspect-[3/4] bg-surface overflow-hidden relative mb-6">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A clean product shot of a navy blue premium cotton polo shirt on a white background. The shirt is displayed flat with soft studio lighting highlighting the fine weave and the subtle brand tag on the sleeve. The look is professional, high-end, and minimalist, typical of a luxury basic brand's online catalog." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAmi5YOWIKe7_gBHKE1CbKyLwuv69P7txBB9ljbCxB1LNU-5fhqZNlZiSjzgw9tTaQnh48OomFQTW7mEJEGQMLj_ujjgezbpUDSwJeMEekvCDL52bCVmQFpHZdThNGGrkpRJl47F2Zu5Xk5-qOOvjSz5pGj9Mv0XcDL1LDY394Nm8UNF_wtkiw3W4ncetbPzz1dwYA-Bm4jaOfUu33mlXmD0yN3CtcBG-7OWRA--_3UQ9wwcQL7mU6eWe8MWGF2z0jNUyuS-0zwdzo')"></div>
+<div class="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-full bg-primary text-white py-4 font-button text-button uppercase">Pedir por WhatsApp</button>
+</div>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-body-md text-body-md text-primary font-medium">Stealth Black</h4>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1">Navy Blue / Algodón Pima</p>
+</div>
+<span class="font-label-caps text-label-caps text-primary">S/69</span>
+</div>
+</div>
+<!-- Product 2 -->
+<div class="group">
+<div class="aspect-[3/4] bg-surface overflow-hidden relative mb-6">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A studio photograph of a crisp white essential polo shirt. The lighting is bright and clean, emphasizing the high-quality 100% cotton texture and the sharp lines of the collar. The background is a soft neutral gray, creating an editorial look for a luxury basics fashion brand." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBuqcnC7C3jpRxnRLcdHxzDtk9OSAsgKcgyZa_a2BaIOx2NtRYZaImJYigCpLBlYdSN5OkHhRyqXROnM7qYJILvARUL0_W1imt7rYT1stskk1JAam3un8uEQ_h9OazOwy44nOV-4FA4frOsK7Rnmw4nxVKFXf0E4FGcmYLs0QBvWCXByktslWviUMXN_VyPv-5HnKkAQxmPyEC9E7jEXHkjZ1beboAIGI8WPxeZFe7pEof134J9r54ygKqUVFl9W02Iy2mdnDOk_OY')"></div>
+<div class="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-full bg-primary text-white py-4 font-button text-button uppercase">Pedir por WhatsApp</button>
+</div>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-body-md text-body-md text-primary font-medium">Phantom White</h4>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1">Blanco / Premium Cotton</p>
+</div>
+<span class="font-label-caps text-label-caps text-primary">S/59</span>
+</div>
+</div>
+<!-- Product 3 -->
+<div class="group">
+<div class="aspect-[3/4] bg-surface overflow-hidden relative mb-6">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A sleek black minimalist polo shirt presented in a high-fashion studio setting. Deep, rich black tones of the fabric are accentuated by subtle rim lighting. The design features a very small, clean logo, embodying the quiet luxury and urban utility aesthetic of BLACKBOX APPAREL." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCFyk5zzGStTjKD-vIRSy3ZgRa58ohWLxZZgO8-8sV9jAHPcB75vA1rxYqAJqkUoZtlEQGinF6lhc3OwMTH2cLo2w0kFkL6jBvPI7S5ianT1kclRGcAksWXyd1nms9ssUYnyGTeN59Rivwy3iJ4tDsOSbtYR0lB-tN4KHotTlXeLMv_Fu2n5zWPasK81UZwiRpGNAQj22AUczLdUYD46TPF-gMK6V3YPy8izRokw2nWXLRjOrnKGRjHFYE4vCrCeNBdBtgUcpM07mI')"></div>
+<div class="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-full bg-primary text-white py-4 font-button text-button uppercase">Pedir por WhatsApp</button>
+</div>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-body-md text-body-md text-primary font-medium">Onyx Basic</h4>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase mt-1">Negro Mate / Calce Regular</p>
+</div>
+<span class="font-label-caps text-label-caps text-primary">S/69</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Why Blackbox -->
+<section class="bg-primary text-on-primary py-section-gap">
+<div class="max-w-container-max mx-auto px-margin-desktop">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-16">
+<div class="flex flex-col items-center text-center"><span class="material-symbols-outlined text-4xl mb-6 font-thin">local_shipping</span><h5 class="font-headline-lg text-headline-lg mb-4">Envíos Rápidos</h5><p class="font-body-md text-body-md opacity-70">Entrega en 24-48h en Lima y envíos a todo el Perú.</p></div>
+<div class="flex flex-col items-center text-center"><span class="material-symbols-outlined text-4xl mb-6 font-thin">payments</span><h5 class="font-headline-lg text-headline-lg mb-4">Facilidad de Pago</h5><p class="font-body-md text-body-md opacity-70">Pagos contra entrega, Yape, Plin o transferencia bancaria.</p></div>
+<div class="flex flex-col items-center text-center"><span class="material-symbols-outlined text-4xl mb-6 font-thin">verified</span><h5 class="font-headline-lg text-headline-lg mb-4">Calidad Superior</h5><p class="font-body-md text-body-md opacity-70">Algodón premium con el mejor fit y estructura del mercado.</p></div>
+</div>
+</div>
+</section>
+<!-- Visual Proof / Lifestyle Gallery -->
+<section class="py-section-gap">
+<div class="max-w-container-max mx-auto px-margin-desktop">
+<div class="grid grid-cols-12 gap-6 h-[700px]">
+<div class="col-span-8 h-full relative group overflow-hidden">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" data-alt="A lifestyle shot of a stylish man in his late 20s wearing a black BLACKBOX polo, walking through a modern urban district. He is wearing dark sunglasses and a classic watch. The background is a mix of glass buildings and warm street lighting, creating a sophisticated and aspirated atmosphere for the brand." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuACcQcEeewFvfGUxoKr1wokoksyq0juVJfVbpna4JpFbHrx4I5YeiE1gXe5qGsYKAEUFRzf2g_eg-aF1uMC2JZipNb6SjjDMfv00XCaGCFYg9NdBArxGD22os2dTXpgfZ_R0uPe1yIc4q1milh3qonNrQJSGKA2wpWBRFUFjB42W9cHeYZfhl5ZvRnmZrZGeskqmwraNuXJQRidUFvc72jWMh-TbSs52jKAYlPmquAlQ8UhDZEQjlLHvECJVCO9EG8CfpXlLcevIqE')"></div>
+</div>
+<div class="col-span-4 flex flex-col gap-6 h-full">
+<div class="h-1/2 relative group overflow-hidden">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" data-alt="A close-up detailed shot focusing on the neckline and collar of a navy blue polo shirt. The stitching is perfect, and the high-density cotton fabric shows a fine, premium grain. The lighting is soft and directional, highlighting the craftsmanship and structural integrity of the garment." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuApbUSfmCzmBb394GYX7ziz1LvNtB3Obv-mRrNzO7ki3dznB3iinxs5oX1CrEupHy7uL6aUTBRJ9fWgyI1DduLGDPlqgace8TjuLaJXhAsgGbZnL8rcMuInKnjpY5it5gASgForwSrjK1HDT8xIdMPWKdlGfF5dEilmDHqEp__tZKQXu-6VRNsUg_THJtx1YLjALaRV0so0FTltG7yp16zsbq1cexJiSDPL7TFfbh4bfQxOddHXJOx-wxKSbNiw_QOZCrJzngMacmY')"></div>
+</div>
+<div class="h-1/2 relative group overflow-hidden">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" data-alt="A minimalist photograph showing the back detail of a white polo shirt. A small, elegant print near the neck is visible. The model has his back to the camera, standing against a textured concrete wall, emphasizing the clean lines and modern silhouette of the apparel." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDGJV3-Y8hYGHYu286xjn5AOEt6CINH5DCBtwMYYuiQQlkczZekw6ErqaEzd_oNOicSOEAxyV9DwJkhoWAst21kYw2J5sxw3ovCRLa8RoZjeITHO-YcCbP7f8QJx8zZ85npmJuJSlvHDpkE_qX354HxQJKP5OtIgzr_kWhdJkQ6hZBYeTEqByOKMUQ_x7dD9OrMO7lFTl8sdfKfV-7OhXkyZrqHcvB0WB0KqDzy1Uym8IObHnUS_amQkdv5i9kLRlY96C24PEfst9c')"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="py-section-gap bg-surface border-t border-outline-variant/30 overflow-hidden relative">
+<div class="max-w-container-max mx-auto px-margin-desktop text-center relative z-10">
+<h2 class="font-display-lg text-display-lg text-primary mb-8 leading-tight">ELEVA TU BÁSICO HOY.</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-12 max-w-xl mx-auto">Únete a la disciplina del buen vestir. Calidad artesanal peruana con diseño contemporáneo.</p>
+<a class="inline-flex items-center gap-4 bg-[#25D366] text-white px-12 py-6 font-button text-button uppercase tracking-[0.2em] transition-all hover:shadow-2xl hover:-translate-y-1 active:translate-y-0" href="https://wa.me/#">
+<span class="material-symbols-outlined">chat</span>
+                    Pedir por WhatsApp Ahora
+                </a>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-primary py-section-gap">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop max-w-container-max mx-auto gap-8">
+<div class="font-headline-lg text-headline-lg font-black text-on-primary">BLACKBOX APPAREL</div>
+<div class="flex flex-col items-center md:items-end gap-4">
+<div class="flex gap-8">
+<a class="font-label-caps text-label-caps text-on-primary/60 hover:text-on-primary transition-colors" href="#">Privacidad</a>
+<a class="font-label-caps text-label-caps text-on-primary/60 hover:text-on-primary transition-colors" href="#">Términos</a>
+<a class="font-label-caps text-label-caps text-on-primary/60 hover:text-on-primary transition-colors" href="#">Envíos</a>
+<a class="font-label-caps text-label-caps text-on-primary/60 hover:text-on-primary transition-colors" href="#">Contacto</a>
+</div>
+<p class="font-label-caps text-label-caps text-on-primary/40">© 2024 BLACKBOX APPAREL. Craftsmanship from the Andes to the world.</p>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interactions and parallax effect for hero
+        window.addEventListener('scroll', () => {
+            const scrollPos = window.pageYOffset;
+            const heroBg = document.querySelector('.transform.scale-105');
+            if (heroBg) {
+                heroBg.style.transform = `scale(1.05) translateY(${scrollPos * 0.2}px)`;
+            }
+        });
+
+        // Simple Fade-in intersection observer
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            section.classList.add('transition-all', 'duration-1000', 'ease-out', 'opacity-0', 'translate-y-10');
+            observer.observe(section);
+        });
+    </script>
+<a class="fixed bottom-8 right-8 z-50 bg-[#25D366] text-white w-16 h-16 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform active:scale-95" href="https://wa.me/#"><span class="material-symbols-outlined text-3xl">chat</span></a></body></html>

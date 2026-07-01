@@ -1,22 +1,29 @@
-import { Header } from "@/components/puerto-norte/header";
-import { Hero } from "@/components/puerto-norte/hero";
-import { Manifiesto } from "@/components/puerto-norte/manifiesto";
-import { Coleccion } from "@/components/puerto-norte/coleccion";
-import { ComoComprar } from "@/components/puerto-norte/como-comprar";
-import { FAQ } from "@/components/puerto-norte/faq";
-import { Footer } from "@/components/puerto-norte/footer";
-import { WhatsAppFloat } from "@/components/puerto-norte/whatsapp-float";
+"use client";
+
+import { Header } from "@/components/blackbox/header";
+import { Hero } from "@/components/blackbox/hero";
+import { Filosofia } from "@/components/blackbox/filosofia";
+import { Coleccion } from "@/components/blackbox/coleccion";
+import { Beneficios } from "@/components/blackbox/beneficios";
+import { Modelo } from "@/components/blackbox/modelo";
+import { CTA } from "@/components/blackbox/cta";
+import { Footer } from "@/components/blackbox/footer";
+import { WhatsAppFloat } from "@/components/blackbox/whatsapp-float";
+import { useScrollReveal } from "@/components/blackbox/use-scroll-reveal";
 
 export default function Home() {
+  useScrollReveal();
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF8F4]">
+    <div className="min-h-screen flex flex-col bg-[#f9f9f9]">
       <Header />
-      <main className="flex-1">
+      <main className="flex-1 pt-20">
         <Hero />
-        <Manifiesto />
+        <Filosofia />
         <Coleccion />
-        <ComoComprar />
-        <FAQ />
+        <Beneficios />
+        <Modelo />
+        <CTA />
       </main>
       <Footer />
       <WhatsAppFloat />

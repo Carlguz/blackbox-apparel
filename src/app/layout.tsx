@@ -1,36 +1,25 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
-});
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Puerto Norte — Herencia que se lleva puesto",
-  description: "Polos premium inspirados en la identidad porteña. Elegancia versátil para el hincha que no se conforma con lo común. Para la reunión, la cena y el día a día.",
-  keywords: ["polos premium", "moda masculina", "Puerto Norte", "herencia", "elegancia", "Perú", "Lima"],
-  authors: [{ name: "Puerto Norte" }],
+  title: "BLACKBOX APPAREL | Esenciales Premium",
+  description: "Polos premium diseñados en Perú para potenciar tu estilo, confianza y fit diario.",
+  keywords: ["BLACKBOX", "apparel", "polos premium", "moda masculina", "Perú"],
+  authors: [{ name: "BLACKBOX APPAREL" }],
   openGraph: {
-    title: "Puerto Norte — Herencia que se lleva puesto",
-    description: "Polos premium inspirados en la identidad porteña. Elegancia versátil para el hincha que no se conforma con lo común.",
-    siteName: "Puerto Norte",
+    title: "BLACKBOX APPAREL | Esenciales Premium",
+    description: "Polos premium diseñados en Perú.",
+    siteName: "BLACKBOX APPAREL",
     type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Puerto Norte — Herencia que se lleva puesto",
-    description: "Polos premium inspirados en la identidad porteña.",
   },
 };
 
@@ -41,8 +30,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body
-        className={`${playfair.variable} ${inter.variable} antialiased bg-background text-foreground`}
+        className={`${inter.variable} antialiased bg-[#f9f9f9] text-[#1a1c1c]`}
       >
         {children}
         <Toaster />
