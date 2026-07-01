@@ -52,3 +52,26 @@ prompt
 server.log
 # Skills directory
 /skills/
+# BLACKBOX - archivos sensibles
+.env
+.env.local
+.env.production
+.env*.local
+
+# Base de datos local SQLite
+db/
+*.db
+*.db-journal
+
+# Imágenes subidas por usuarios (van a Supabase Storage)
+public/uploads/
+
+# Logs del servidor
+*.log
+server.log
+dev.log
+
+# Configuración local
+.claude
+.z-ai-config
+.zscripts/
