@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
+import { sendOrderNotificationEmail } from "@/lib/notifications";
+import { defaultContent, type SiteContentData } from "@/components/blackbox/content";
 
 export const dynamic = "force-dynamic";
 
@@ -194,6 +196,36 @@ export async function POST(req: NextRequest) {
       orderId = order.id;
       storage = "local";
     }
+
+    // Fire-and-forget notification email (before return so it actually runs)
+    void (async () => {
+      try {
+        let content: SiteContentData = defaultContent;
+        if (isSupabaseConfigured) {
+          const sb = getSupabase();
+          const { data } = await sb!.from("site_content").select("data").eq("id", "singleton").maybeSingle();
+          if (data?.data) content = { ...defaultContent, ...JSON.parse(data.data) };
+        } else {
+          const row = await db.siteContent.findUnique({ where: { id: "singleton" } });
+          if (row) content = { ...defaultContent, ...JSON.parse(row.data) };
+        }
+        if (content.notifications?.emailEnabled) {
+          await sendOrderNotificationEmail(content, {
+            id: orderId,
+            productName,
+            productPrice,
+            size,
+            quantity,
+            total,
+            customerName,
+            customerPhone,
+            source,
+          });
+        }
+      } catch (e) {
+        console.warn("Notification email failed:", e);
+      }
+    })();
 
     return NextResponse.json({ ok: true, orderId, status, total, storage });
   } catch (e) {

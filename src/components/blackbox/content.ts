@@ -34,6 +34,22 @@ export type ThemeColors = {
   whatsapp: string;
 };
 
+export type NotificationsConfig = {
+  // Email destino donde recibir notificaciones de pedidos
+  notifyEmail: string;
+  // WhatsApp interno (diferente del WhatsApp público de clientes)
+  notifyWhatsapp: string;
+  // SMTP config
+  smtpHost: string;
+  smtpPort: string;
+  smtpUser: string;
+  smtpPassword: string;
+  smtpFrom: string;
+  // Toggles
+  emailEnabled: boolean;
+  whatsappBadgeEnabled: boolean;
+};
+
 export type SiteContentData = {
   whatsappNumber: string;
   instagramUrl: string;
@@ -78,6 +94,7 @@ export type SiteContentData = {
     title: string;
     rows: { size: string; chest: string; length: string; waist: string }[];
   };
+  notifications: NotificationsConfig;
 };
 
 export const defaultContent: SiteContentData = {
@@ -204,6 +221,17 @@ export const defaultContent: SiteContentData = {
       { size: "XL", chest: "55-57 cm", length: "74 cm", waist: "49-51 cm" },
       { size: "XXL", chest: "58-60 cm", length: "76 cm", waist: "52-54 cm" },
     ],
+  },
+  notifications: {
+    notifyEmail: "",
+    notifyWhatsapp: "",
+    smtpHost: "smtp.gmail.com",
+    smtpPort: "465",
+    smtpUser: "",
+    smtpPassword: "",
+    smtpFrom: "BLACKBOX APPAREL <no-reply@blackbox.pe>",
+    emailEnabled: false,
+    whatsappBadgeEnabled: true,
   },
 };
 

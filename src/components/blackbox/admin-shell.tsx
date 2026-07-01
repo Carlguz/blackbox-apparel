@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AdminPanel } from "./admin-panel";
 import { type SiteContentData } from "./content";
 
-const ADMIN_PASSWORD = "blackbox2026"; // simple lock - change as needed
+const ADMIN_PASSWORD = "blackbox2026";
 
 export function AdminShell({
   content,
@@ -21,6 +21,27 @@ export function AdminShell({
   const [unlocked, setUnlocked] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+
+  // Poll for pending orders (badge)
+  const badgeEnabled = content.notifications?.whatsappBadgeEnabled;
+  useEffect(() => {
+    if (!badgeEnabled) return;
+    let mounted = true;
+    const check = async () => {
+      try {
+        const res = await fetch("/api/orders?status=pending", { cache: "no-store" });
+        const json = await res.json();
+        if (mounted) setPendingCount(json.orders?.length || 0);
+      } catch {}
+    };
+    check();
+    const interval = setInterval(check, 30000);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, [badgeEnabled]);
 
   const handleUnlock = () => {
     if (password === ADMIN_PASSWORD) {
@@ -35,11 +56,16 @@ export function AdminShell({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-8 left-8 z-40 bg-black/80 backdrop-blur-sm text-white w-12 h-12 flex items-center justify-center shadow-xl hover:bg-black hover:scale-110 transition-all"
+        className="fixed bottom-8 left-8 z-40 bg-black/80 backdrop-blur-sm text-white w-12 h-12 flex items-center justify-center shadow-xl hover:bg-black hover:scale-110 transition-all relative"
         aria-label="Panel de administración"
         title="Panel de administración"
       >
         <span className="material-symbols-outlined">settings</span>
+        {pendingCount > 0 && (
+          <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+            {pendingCount > 9 ? "9+" : pendingCount}
+          </span>
+        )}
       </button>
     );
   }

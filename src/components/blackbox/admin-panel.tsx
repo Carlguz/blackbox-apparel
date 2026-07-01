@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { type SiteContentData, type EditableProduct, type EditableBenefit, type ProductSize } from "./content";
 import { DashboardTab } from "./dashboard-tab";
 
-type Tab = "dashboard" | "general" | "hero" | "filosofia" | "coleccion" | "productos" | "stock" | "beneficios" | "modelo" | "tema" | "newsletter" | "cta" | "footer" | "pedidos";
+type Tab = "dashboard" | "general" | "hero" | "filosofia" | "coleccion" | "productos" | "stock" | "beneficios" | "modelo" | "tema" | "newsletter" | "notificaciones" | "exportar" | "cta" | "footer" | "pedidos";
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: "dashboard", label: "Dashboard", icon: "dashboard" },
@@ -18,6 +18,8 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: "modelo", label: "Galería", icon: "image" },
   { id: "tema", label: "Tema", icon: "palette" },
   { id: "newsletter", label: "Newsletter", icon: "email" },
+  { id: "notificaciones", label: "Notificaciones", icon: "notifications" },
+  { id: "exportar", label: "Exportar", icon: "download" },
   { id: "cta", label: "CTA Final", icon: "campaign" },
   { id: "footer", label: "Footer", icon: "dock_to_bottom" },
   { id: "pedidos", label: "Pedidos", icon: "shopping_bag" },
@@ -182,7 +184,9 @@ export function AdminPanel({
               {tab === "stock" && "Controla el inventario por talla de cada producto."}
               {tab === "tema" && "Personaliza los colores de la marca."}
               {tab === "newsletter" && "Captura de leads y lista de suscriptores."}
-              {!["dashboard", "pedidos", "stock", "tema", "newsletter"].includes(tab) && "Edita los campos y guarda los cambios al final."}
+              {tab === "notificaciones" && "Configura email y WhatsApp donde recibir alertas de pedidos."}
+              {tab === "exportar" && "Descarga tus datos en CSV para Excel, Google Sheets o Instagram Shopping."}
+              {!["dashboard", "pedidos", "stock", "tema", "newsletter", "notificaciones", "exportar"].includes(tab) && "Edita los campos y guarda los cambios al final."}
             </p>
           </div>
 
@@ -425,6 +429,10 @@ export function AdminPanel({
             </div>
           )}
 
+          {tab === "notificaciones" && <NotificationsTab content={content} update={update} />}
+
+          {tab === "exportar" && <ExportTab />}
+
           {tab === "cta" && (
             <div className="space-y-6">
               <Field label="Título">
@@ -504,6 +512,237 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (v: string)
     <div className="flex items-center gap-3">
       <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="w-12 h-12 border border-[#c4c7c7] cursor-pointer" />
       <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className="bb-input flex-1" />
+    </div>
+  );
+}
+
+// ─── Notifications Tab ───────────────────────────────────────────────
+function NotificationsTab({
+  content,
+  update,
+}: {
+  content: SiteContentData;
+  update: <K extends keyof SiteContentData>(key: K, value: SiteContentData[K]) => void;
+}) {
+  const n = content.notifications;
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{ ok: boolean; msg: string } | null>(null);
+
+  const setN = (patch: Partial<typeof n>) => {
+    update("notifications", { ...n, ...patch });
+  };
+
+  const testEmail = async () => {
+    setTesting(true);
+    setTestResult(null);
+    try {
+      const res = await fetch("/api/notify/test", { method: "POST" });
+      const json = await res.json();
+      if (json.ok) {
+        setTestResult({ ok: true, msg: "✓ Email enviado. Revisa tu bandeja (y spam)." });
+      } else {
+        setTestResult({ ok: false, msg: "✗ " + (json.error || "Error desconocido") });
+      }
+    } catch (e) {
+      setTestResult({ ok: false, msg: "✗ " + (e as Error).message });
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Toggles */}
+      <div className="bg-white p-5 border border-[#c4c7c7] space-y-4">
+        <h4 className="font-bold text-black">Canales de notificación</h4>
+        <label className="flex items-center justify-between cursor-pointer">
+          <div>
+            <div className="text-body-md text-black font-medium">Notificaciones por Email</div>
+            <div className="text-sm text-[#666]">Recibe un email cada vez que llegue un pedido nuevo</div>
+          </div>
+          <input
+            type="checkbox"
+            checked={n.emailEnabled}
+            onChange={(e) => setN({ emailEnabled: e.target.checked })}
+            className="w-6 h-6"
+          />
+        </label>
+      </div>
+
+      {/* Email config */}
+      <div className="bg-white p-6 border border-[#c4c7c7] space-y-4">
+        <h4 className="font-bold text-black">Configuración de Email</h4>
+
+        <Field label="Email donde recibir notificaciones">
+          <input type="email" value={n.notifyEmail} onChange={(e) => setN({ notifyEmail: e.target.value })} placeholder="tucorreo@gmail.com" className="bb-input" />
+          <p className="text-xs text-[#666] mt-1">A este correo llegarán las alertas de pedidos nuevos.</p>
+        </Field>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="SMTP Host">
+            <input type="text" value={n.smtpHost} onChange={(e) => setN({ smtpHost: e.target.value })} placeholder="smtp.gmail.com" className="bb-input" />
+          </Field>
+          <Field label="SMTP Puerto">
+            <input type="text" value={n.smtpPort} onChange={(e) => setN({ smtpPort: e.target.value })} placeholder="465" className="bb-input" />
+          </Field>
+        </div>
+
+        <Field label="SMTP Usuario (tu email)">
+          <input type="text" value={n.smtpUser} onChange={(e) => setN({ smtpUser: e.target.value })} placeholder="tucorreo@gmail.com" className="bb-input" />
+        </Field>
+
+        <Field label="SMTP Contraseña (App Password)">
+          <input type="password" value={n.smtpPassword} onChange={(e) => setN({ smtpPassword: e.target.value })} placeholder="••••••••••••" className="bb-input" />
+          <p className="text-xs text-[#666] mt-1">
+            Para Gmail: NO uses tu contraseña normal. Crea una &quot;App Password&quot; en{" "}
+            <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener noreferrer" className="text-[#1F3C88] underline">
+              myaccount.google.com/apppasswords
+            </a>
+            . Necesitas activar 2FA primero.
+          </p>
+        </Field>
+
+        <Field label="Remitente (From)">
+          <input type="text" value={n.smtpFrom} onChange={(e) => setN({ smtpFrom: e.target.value })} placeholder="BLACKBOX APPAREL <no-reply@blackbox.pe>" className="bb-input" />
+        </Field>
+
+        <div className="pt-3 border-t border-[#c4c7c7]">
+          <button
+            onClick={testEmail}
+            disabled={testing}
+            className="px-5 py-2.5 bg-black text-white text-button uppercase hover:bg-[#25D366] transition-colors disabled:opacity-50"
+          >
+            {testing ? "Enviando..." : "Probar notificación"}
+          </button>
+          {testResult && (
+            <p className={`text-sm mt-3 ${testResult.ok ? "text-[#2ECC71]" : "text-red-600"}`}>
+              {testResult.msg}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* WhatsApp interno */}
+      <div className="bg-white p-6 border border-[#c4c7c7] space-y-4">
+        <h4 className="font-bold text-black">WhatsApp interno de notificaciones (opcional)</h4>
+        <p className="text-sm text-[#666]">
+          Número donde tú recibes alertas. Diferente del WhatsApp público de clientes.
+          Cuando llegue un pedido, podrás reenviarlo a este WhatsApp con un clic desde el tab Pedidos.
+        </p>
+        <Field label="WhatsApp interno (con código país, sin +)">
+          <input type="text" value={n.notifyWhatsapp} onChange={(e) => setN({ notifyWhatsapp: e.target.value })} placeholder="51999888777" className="bb-input" />
+        </Field>
+        <label className="flex items-center justify-between cursor-pointer pt-2">
+          <div>
+            <div className="text-body-md text-black font-medium">Mostrar badge de pedidos nuevos</div>
+            <div className="text-sm text-[#666]">Aparece un punto rojo en el botón del admin cuando hay pedidos pendientes</div>
+          </div>
+          <input
+            type="checkbox"
+            checked={n.whatsappBadgeEnabled}
+            onChange={(e) => setN({ whatsappBadgeEnabled: e.target.checked })}
+            className="w-6 h-6"
+          />
+        </label>
+      </div>
+
+      {/* Guía rápida */}
+      <div className="bg-[#1a1c1c] text-white p-6 space-y-3">
+        <h4 className="font-bold">📖 Guía rápida</h4>
+        <div className="text-sm space-y-2 text-white/80">
+          <p><strong className="text-white">Gmail:</strong> Activa 2FA → crea App Password en myaccount.google.com/apppasswords → úsala aquí</p>
+          <p><strong className="text-white">Outlook/Hotmail:</strong> Host: smtp.office365.com · Puerto: 587</p>
+          <p><strong className="text-white">Yahoo:</strong> Host: smtp.mail.yahoo.com · Puerto: 465</p>
+          <p><strong className="text-white">Zoho:</strong> Host: smtp.zoho.com · Puerto: 465</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Export Tab ──────────────────────────────────────────────────────
+function ExportTab() {
+  const [loading, setLoading] = useState<string | null>(null);
+
+  const download = async (type: "orders" | "instagram") => {
+    setLoading(type);
+    try {
+      const url = type === "orders" ? "/api/export/orders" : "/api/export/instagram";
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Error al exportar");
+      const blob = await res.blob();
+      const a = document.createElement("a");
+      const urlObj = URL.createObjectURL(blob);
+      a.href = urlObj;
+      a.download = type === "orders"
+        ? `pedidos-blackbox-${new Date().toISOString().slice(0, 10)}.csv`
+        : "instagram-shopping-feed.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(urlObj);
+    } catch (e) {
+      alert("Error: " + (e as Error).message);
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Pedidos CSV */}
+      <div className="bg-white p-6 border border-[#c4c7c7]">
+        <div className="flex items-start gap-4">
+          <span className="material-symbols-outlined text-3xl text-black">table_view</span>
+          <div className="flex-1">
+            <h4 className="font-bold text-black mb-1">Exportar Pedidos (CSV)</h4>
+            <p className="text-sm text-[#666] mb-4">
+              Descarga todos los pedidos en formato CSV. Abrelo en Excel, Google Sheets o Numbers.
+              Incluye: ID, fecha, producto, talla, cantidad, total, estado, cliente, teléfono, email.
+            </p>
+            <button
+              onClick={() => download("orders")}
+              disabled={loading === "orders"}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white text-button uppercase hover:bg-[#25D366] transition-colors disabled:opacity-50"
+            >
+              <span className="material-symbols-outlined text-base">download</span>
+              {loading === "orders" ? "Generando..." : "Descargar pedidos CSV"}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Instagram Shopping */}
+      <div className="bg-white p-6 border border-[#c4c7c7]">
+        <div className="flex items-start gap-4">
+          <span className="material-symbols-outlined text-3xl text-black">shopping_bag</span>
+          <div className="flex-1">
+            <h4 className="font-bold text-black mb-1">Feed Instagram Shopping (CSV)</h4>
+            <p className="text-sm text-[#666] mb-4">
+              Genera un catálogo en formato Meta/Instagram Shopping. Súbelo en Facebook Business Manager
+              → Catalog → Bulk upload. Formato compatible con Instagram Shopping tags.
+            </p>
+            <button
+              onClick={() => download("instagram")}
+              disabled={loading === "instagram"}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white text-button uppercase hover:bg-[#25D366] transition-colors disabled:opacity-50"
+            >
+              <span className="material-symbols-outlined text-base">download</span>
+              {loading === "instagram" ? "Generando..." : "Descargar feed CSV"}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Info */}
+      <div className="bg-[#1a1c1c] text-white p-6 space-y-2">
+        <h4 className="font-bold">💡 ¿Para qué sirve exportar?</h4>
+        <ul className="text-sm space-y-1.5 text-white/80 list-disc list-inside">
+          <li><strong className="text-white">Pedidos CSV:</strong> Llevar contabilidad, ver tendencias, compartir con tu contador</li>
+          <li><strong className="text-white">Instagram Shopping:</strong> Etiquetar productos en tus posts de Instagram con precio y link</li>
+          <li><strong className="text-white">Google Sheets:</strong> Archivo → Importar → Subir CSV</li>
+        </ul>
+      </div>
     </div>
   );
 }
@@ -624,6 +863,22 @@ function OrdersTab() {
                   ))}
                   <button onClick={() => deleteOrder(o.id)} className="ml-auto px-3 py-1.5 text-label-caps uppercase text-red-600 hover:bg-red-50">Eliminar</button>
                 </div>
+                {/* Internal WhatsApp forward */}
+                {content.notifications?.notifyWhatsapp && (
+                  <div className="mt-2 pt-2 border-t border-[#eee]">
+                    <a
+                      href={`https://wa.me/${content.notifications.notifyWhatsapp}?text=${encodeURIComponent(
+                        `🛒 PEDIDO ${o.id}\n${o.product_name} × ${o.quantity}${o.size ? ` · Talla ${o.size}` : ""}\nTotal: ${o.total}\nCliente: ${o.customer_name || "Pendiente"} · ${o.customer_phone}`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 text-label-caps uppercase bg-[#25D366] text-white hover:bg-[#1FB855] transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-sm">forward_to_inbox</span>
+                      Reenviar a mi WhatsApp
+                    </a>
+                  </div>
+                )}
               </div>
             );
           })}
