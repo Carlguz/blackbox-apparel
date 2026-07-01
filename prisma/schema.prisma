@@ -12,7 +12,7 @@ datasource db {
 
 model SiteContent {
   id        String   @id @default("singleton")
-  data      String   // JSON string with all editable content
+  data      String   // JSON string with all editable content (incl. theme colors)
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
 }
@@ -22,9 +22,12 @@ model Customer {
   name      String?
   phone     String   @unique
   email     String?
+  city      String?
+  notes     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   orders    Order[]
+  leads     Lead[]
 }
 
 model Order {
@@ -39,6 +42,33 @@ model Order {
   status      String   @default("pending") // pending | confirmed | shipped | delivered | cancelled
   total       String
   notes       String?
+  source      String?  // landing | product_page | cta
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Lead {
+  id         String   @id @default(cuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+  email      String
+  source     String   @default("newsletter")
+  createdAt  DateTime @default(now())
+
+  @@index([email])
+}
+
+model PageView {
+  id        String   @id @default(cuid())
+  path      String
+  referrer  String?
+  country   String?
+  device    String?
+  createdAt DateTime @default(now())
+
+  @@index([path])
+  @@index([createdAt])
 }

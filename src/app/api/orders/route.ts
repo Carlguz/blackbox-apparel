@@ -22,6 +22,7 @@ export type OrderRow = {
   status: OrderStatus;
   total: string;
   notes: string | null;
+  source: string | null;
   created_at: string;
 };
 
@@ -34,7 +35,7 @@ export async function GET(req: NextRequest) {
     if (isSupabaseConfigured) {
       const sb = getSupabase();
       let q = sb!.from(ORDERS_TABLE).select(
-        "id, customer_id, product_id, product_name, product_price, size, quantity, status, total, notes, created_at, customers(name, phone)"
+        "id, customer_id, product_id, product_name, product_price, size, quantity, status, total, notes, source, created_at, customers(name, phone)"
       );
       if (status) q = q.eq("status", status);
       q = q.order("created_at", { ascending: false });
@@ -53,6 +54,7 @@ export async function GET(req: NextRequest) {
           status: r.status,
           total: r.total,
           notes: r.notes,
+          source: r.source,
           created_at: r.created_at,
         }));
       }
@@ -79,6 +81,7 @@ export async function GET(req: NextRequest) {
         status: o.status as OrderStatus,
         total: o.total,
         notes: o.notes,
+        source: o.source,
         created_at: o.createdAt.toISOString(),
       }));
     }
@@ -104,6 +107,7 @@ export async function POST(req: NextRequest) {
       size,
       quantity = 1,
       notes,
+      source,
     } = body as {
       customerName?: string;
       customerPhone: string;
@@ -114,6 +118,7 @@ export async function POST(req: NextRequest) {
       size?: string;
       quantity?: number;
       notes?: string;
+      source?: string;
     };
 
     if (!customerPhone || !productId || !productName) {
@@ -158,6 +163,7 @@ export async function POST(req: NextRequest) {
           status,
           total,
           notes: notes || null,
+          source: source || null,
         })
         .select("id")
         .single();
@@ -182,6 +188,7 @@ export async function POST(req: NextRequest) {
           status,
           total,
           notes: notes || null,
+          source: source || null,
         },
       });
       orderId = order.id;

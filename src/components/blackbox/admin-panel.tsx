@@ -1,18 +1,23 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { type SiteContentData, type EditableProduct, type EditableBenefit } from "./content";
+import { type SiteContentData, type EditableProduct, type EditableBenefit, type ProductSize } from "./content";
+import { DashboardTab } from "./dashboard-tab";
 
-type Tab = "general" | "hero" | "filosofia" | "coleccion" | "productos" | "beneficios" | "modelo" | "cta" | "footer" | "pedidos";
+type Tab = "dashboard" | "general" | "hero" | "filosofia" | "coleccion" | "productos" | "stock" | "beneficios" | "modelo" | "tema" | "newsletter" | "cta" | "footer" | "pedidos";
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
+  { id: "dashboard", label: "Dashboard", icon: "dashboard" },
   { id: "general", label: "General", icon: "settings" },
   { id: "hero", label: "Hero", icon: "view_carousel" },
   { id: "filosofia", label: "Filosofía", icon: "format_quote" },
   { id: "coleccion", label: "Colección", icon: "grid_view" },
   { id: "productos", label: "Productos", icon: "checkroom" },
+  { id: "stock", label: "Stock", icon: "inventory_2" },
   { id: "beneficios", label: "Beneficios", icon: "verified" },
   { id: "modelo", label: "Galería", icon: "image" },
+  { id: "tema", label: "Tema", icon: "palette" },
+  { id: "newsletter", label: "Newsletter", icon: "email" },
   { id: "cta", label: "CTA Final", icon: "campaign" },
   { id: "footer", label: "Footer", icon: "dock_to_bottom" },
   { id: "pedidos", label: "Pedidos", icon: "shopping_bag" },
@@ -24,28 +29,7 @@ const MATERIAL_ICONS = [
   "auto_awesome", "bolt", "trending_up", "savings", "credit_card", "support_agent",
 ];
 
-type OrderStatus = "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
-const ORDER_STATUSES: { value: OrderStatus; label: string; color: string }[] = [
-  { value: "pending", label: "Pendiente", color: "#a9a9a9" },
-  { value: "confirmed", label: "Confirmado", color: "#1F3C88" },
-  { value: "shipped", label: "Enviado", color: "#C9A961" },
-  { value: "delivered", label: "Entregado", color: "#2ECC71" },
-  { value: "cancelled", label: "Cancelado", color: "#ba1a1a" },
-];
-
-type OrderRow = {
-  id: string;
-  customer_name: string | null;
-  customer_phone: string;
-  product_name: string;
-  product_price: string;
-  size: string | null;
-  quantity: number;
-  status: OrderStatus;
-  total: string;
-  notes: string | null;
-  created_at: string;
-};
+const ALL_SIZES: ProductSize[] = ["XS", "S", "M", "L", "XL", "XXL"];
 
 export function AdminPanel({
   content,
@@ -60,7 +44,7 @@ export function AdminPanel({
   saving: boolean;
   onClose: () => void;
 }) {
-  const [tab, setTab] = useState<Tab>("general");
+  const [tab, setTab] = useState<Tab>("dashboard");
   const [savedFlash, setSavedFlash] = useState(false);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
@@ -76,14 +60,13 @@ export function AdminPanel({
     }
   };
 
-  const uploadImage = async (file: File, target: "hero" | `product-${string}` | `modelo-grande` | `modelo-peq1` | `modelo-peq2`) => {
+  const uploadImage = async (file: File, target: string) => {
     const formData = new FormData();
     formData.append("file", file);
     try {
       const res = await fetch("/api/upload", { method: "POST", body: formData });
-      if (!res.ok) throw new Error("Upload failed");
       const json = await res.json();
-      if (!json.ok) throw new Error(json.error || "Upload failed");
+      if (!json.ok) throw new Error(json.error);
       const url: string = json.url;
 
       if (target === "hero") {
@@ -97,6 +80,9 @@ export function AdminPanel({
       } else if (target.startsWith("product-")) {
         const pid = target.replace("product-", "");
         update("products", content.products.map((p) => (p.id === pid ? { ...p, image: url } : p)));
+      } else if (target.startsWith("product-back-")) {
+        const pid = target.replace("product-back-", "");
+        update("products", content.products.map((p) => (p.id === pid ? { ...p, backImage: url } : p)));
       }
     } catch (e) {
       alert("Error al subir imagen: " + (e as Error).message);
@@ -112,6 +98,12 @@ export function AdminPanel({
       price: "S/0",
       image: "/products/polo-slate-front.png",
       alt: "Nuevo producto BLACKBOX",
+      description: "Descripción del producto.",
+      story: "",
+      material: "100% Algodón Pima · 240 g/m²",
+      care: "Lavar en frío · Secar a la sombra",
+      sizes: ["S", "M", "L", "XL", "XXL"],
+      stock: { S: 10, M: 10, L: 10, XL: 10, XXL: 10 },
     };
     update("products", [...content.products, newProduct]);
   };
@@ -185,25 +177,27 @@ export function AdminPanel({
               {TABS.find((t) => t.id === tab)?.label}
             </h2>
             <p className="text-body-md text-[#444748] mt-1">
-              {tab === "pedidos"
-                ? "Pedidos generados cuando un cliente hace clic en WhatsApp."
-                : "Edita los campos y guarda los cambios al final."}
+              {tab === "dashboard" && "Métricas en tiempo real de tu tienda."}
+              {tab === "pedidos" && "Pedidos generados cuando un cliente hace clic en WhatsApp."}
+              {tab === "stock" && "Controla el inventario por talla de cada producto."}
+              {tab === "tema" && "Personaliza los colores de la marca."}
+              {tab === "newsletter" && "Captura de leads y lista de suscriptores."}
+              {!["dashboard", "pedidos", "stock", "tema", "newsletter"].includes(tab) && "Edita los campos y guarda los cambios al final."}
             </p>
           </div>
+
+          {tab === "dashboard" && <DashboardTab />}
 
           {tab === "general" && (
             <div className="space-y-6">
               <Field label="Número de WhatsApp (con código país, sin +)">
-                <input
-                  type="text"
-                  value={content.whatsappNumber}
-                  onChange={(e) => update("whatsappNumber", e.target.value)}
-                  placeholder="51999888777"
-                  className="bb-input"
-                />
-                <p className="text-xs text-[#666] mt-2">
-                  Ejemplo: 51 + 999888777. Todos los botones de WhatsApp usarán este número.
-                </p>
+                <input type="text" value={content.whatsappNumber} onChange={(e) => update("whatsappNumber", e.target.value)} placeholder="51999888777" className="bb-input" />
+              </Field>
+              <Field label="URL de Instagram">
+                <input type="text" value={content.instagramUrl} onChange={(e) => update("instagramUrl", e.target.value)} className="bb-input" />
+              </Field>
+              <Field label="URL de TikTok">
+                <input type="text" value={content.tiktokUrl} onChange={(e) => update("tiktokUrl", e.target.value)} className="bb-input" />
               </Field>
             </div>
           )}
@@ -223,12 +217,7 @@ export function AdminPanel({
                 <input type="text" value={content.hero.ctaText} onChange={(e) => update("hero", { ...content.hero, ctaText: e.target.value })} className="bb-input" />
               </Field>
               <Field label="Imagen de fondo">
-                <ImagePicker
-                  url={content.hero.backgroundImage}
-                  onPick={(file) => uploadImage(file, "hero")}
-                  onChange={(url) => update("hero", { ...content.hero, backgroundImage: url })}
-                  inputRef={(el) => { fileInputRefs.current["hero"] = el; }}
-                />
+                <ImagePicker url={content.hero.backgroundImage} onPick={(f) => uploadImage(f, "hero")} onChange={(url) => update("hero", { ...content.hero, backgroundImage: url })} inputRef={(el) => { fileInputRefs.current["hero"] = el; }} />
               </Field>
             </div>
           )}
@@ -261,9 +250,7 @@ export function AdminPanel({
                 <div key={p.id} className="bg-white p-6 border border-[#c4c7c7] space-y-4">
                   <div className="flex items-center justify-between">
                     <h4 className="font-bold text-black">Producto {idx + 1}</h4>
-                    <button onClick={() => removeProduct(p.id)} className="text-sm text-red-600 hover:text-red-800">
-                      Eliminar
-                    </button>
+                    <button onClick={() => removeProduct(p.id)} className="text-sm text-red-600 hover:text-red-800">Eliminar</button>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <Field label="Nombre">
@@ -276,16 +263,44 @@ export function AdminPanel({
                   <Field label="Etiqueta (material/color)">
                     <input type="text" value={p.label} onChange={(e) => updateProduct(p.id, { label: e.target.value })} className="bb-input" />
                   </Field>
-                  <Field label="Texto alternativo (accesibilidad)">
-                    <input type="text" value={p.alt} onChange={(e) => updateProduct(p.id, { alt: e.target.value })} className="bb-input" />
+                  <Field label="Descripción corta (landing)">
+                    <textarea value={p.description} onChange={(e) => updateProduct(p.id, { description: e.target.value })} className="bb-input min-h-[60px]" />
                   </Field>
-                  <Field label="Imagen del producto">
-                    <ImagePicker
-                      url={p.image}
-                      onPick={(file) => uploadImage(file, `product-${p.id}`)}
-                      onChange={(url) => updateProduct(p.id, { image: url })}
-                      inputRef={(el) => { fileInputRefs.current[`product-${p.id}`] = el; }}
-                    />
+                  <Field label="Historia (página de producto)">
+                    <textarea value={p.story} onChange={(e) => updateProduct(p.id, { story: e.target.value })} className="bb-input min-h-[80px]" />
+                  </Field>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Field label="Material">
+                      <input type="text" value={p.material} onChange={(e) => updateProduct(p.id, { material: e.target.value })} className="bb-input" />
+                    </Field>
+                    <Field label="Cuidados">
+                      <input type="text" value={p.care} onChange={(e) => updateProduct(p.id, { care: e.target.value })} className="bb-input" />
+                    </Field>
+                  </div>
+                  <Field label="Tallas disponibles">
+                    <div className="flex flex-wrap gap-2">
+                      {ALL_SIZES.map((s) => {
+                        const checked = p.sizes.includes(s);
+                        return (
+                          <button
+                            key={s}
+                            onClick={() => {
+                              const sizes = checked ? p.sizes.filter((x) => x !== s) : [...p.sizes, s];
+                              updateProduct(p.id, { sizes });
+                            }}
+                            className={`w-12 h-10 text-button font-medium border transition-all ${checked ? "bg-black text-white border-black" : "bg-white text-black border-[#c4c7c7]"}`}
+                          >
+                            {s}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </Field>
+                  <Field label="Imagen frontal">
+                    <ImagePicker url={p.image} onPick={(f) => uploadImage(f, `product-${p.id}`)} onChange={(url) => updateProduct(p.id, { image: url })} inputRef={(el) => { fileInputRefs.current[`product-${p.id}`] = el; }} />
+                  </Field>
+                  <Field label="Imagen espalda (opcional)">
+                    <ImagePicker url={p.backImage || ""} onPick={(f) => uploadImage(f, `product-back-${p.id}`)} onChange={(url) => updateProduct(p.id, { backImage: url })} inputRef={(el) => { fileInputRefs.current[`product-back-${p.id}`] = el; }} />
                   </Field>
                 </div>
               ))}
@@ -295,15 +310,50 @@ export function AdminPanel({
             </div>
           )}
 
+          {tab === "stock" && (
+            <div className="space-y-6">
+              {content.products.map((p) => (
+                <div key={p.id} className="bg-white p-6 border border-[#c4c7c7]">
+                  <div className="flex items-baseline justify-between mb-4">
+                    <h4 className="font-bold text-black">{p.name}</h4>
+                    <span className="text-label-caps text-[#666] uppercase">
+                      Total: {Object.values(p.stock || {}).reduce((a, b) => a + b, 0)} u
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+                    {ALL_SIZES.map((s) => {
+                      const stock = p.stock?.[s] ?? 0;
+                      const available = p.sizes.includes(s);
+                      return (
+                        <div key={s} className={`${!available ? "opacity-40" : ""}`}>
+                          <div className="text-label-caps text-[#666] uppercase mb-1 text-center">{s}</div>
+                          <input
+                            type="number"
+                            min={0}
+                            value={stock}
+                            disabled={!available}
+                            onChange={(e) => {
+                              const next = { ...p.stock, [s]: parseInt(e.target.value) || 0 };
+                              updateProduct(p.id, { stock: next });
+                            }}
+                            className="bb-input text-center"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           {tab === "beneficios" && (
             <div className="space-y-6">
               {content.beneficios.map((b, idx) => (
                 <div key={b.id} className="bg-white p-6 border border-[#c4c7c7] space-y-4">
                   <div className="flex items-center justify-between">
                     <h4 className="font-bold text-black">Beneficio {idx + 1}</h4>
-                    <button onClick={() => removeBenefit(b.id)} className="text-sm text-red-600 hover:text-red-800">
-                      Eliminar
-                    </button>
+                    <button onClick={() => removeBenefit(b.id)} className="text-sm text-red-600 hover:text-red-800">Eliminar</button>
                   </div>
                   <Field label="Título">
                     <input type="text" value={b.title} onChange={(e) => updateBenefit(b.id, { title: e.target.value })} className="bb-input" />
@@ -313,13 +363,11 @@ export function AdminPanel({
                   </Field>
                   <Field label="Icono (Material Symbol)">
                     <select value={b.icon} onChange={(e) => updateBenefit(b.id, { icon: e.target.value })} className="bb-input">
-                      {MATERIAL_ICONS.map((ic) => (
-                        <option key={ic} value={ic}>{ic}</option>
-                      ))}
+                      {MATERIAL_ICONS.map((ic) => (<option key={ic} value={ic}>{ic}</option>))}
                     </select>
                     <div className="flex items-center gap-2 mt-2">
                       <span className="material-symbols-outlined text-2xl text-black">{b.icon}</span>
-                      <span className="text-xs text-[#666]">Vista previa del icono</span>
+                      <span className="text-xs text-[#666]">Vista previa</span>
                     </div>
                   </Field>
                 </div>
@@ -333,29 +381,47 @@ export function AdminPanel({
           {tab === "modelo" && (
             <div className="space-y-6">
               <Field label="Imagen grande (calle)">
-                <ImagePicker
-                  url={content.modelo.imageGrande}
-                  onPick={(file) => uploadImage(file, "modelo-grande")}
-                  onChange={(url) => update("modelo", { ...content.modelo, imageGrande: url })}
-                  inputRef={(el) => { fileInputRefs.current["modelo-grande"] = el; }}
-                />
+                <ImagePicker url={content.modelo.imageGrande} onPick={(f) => uploadImage(f, "modelo-grande")} onChange={(url) => update("modelo", { ...content.modelo, imageGrande: url })} inputRef={(el) => { fileInputRefs.current["modelo-grande"] = el; }} />
               </Field>
               <Field label="Imagen pequeña 1 (cuello)">
-                <ImagePicker
-                  url={content.modelo.imagePequena1}
-                  onPick={(file) => uploadImage(file, "modelo-peq1")}
-                  onChange={(url) => update("modelo", { ...content.modelo, imagePequena1: url })}
-                  inputRef={(el) => { fileInputRefs.current["modelo-peq1"] = el; }}
-                />
+                <ImagePicker url={content.modelo.imagePequena1} onPick={(f) => uploadImage(f, "modelo-peq1")} onChange={(url) => update("modelo", { ...content.modelo, imagePequena1: url })} inputRef={(el) => { fileInputRefs.current["modelo-peq1"] = el; }} />
               </Field>
               <Field label="Imagen pequeña 2 (espalda)">
-                <ImagePicker
-                  url={content.modelo.imagePequena2}
-                  onPick={(file) => uploadImage(file, "modelo-peq2")}
-                  onChange={(url) => update("modelo", { ...content.modelo, imagePequena2: url })}
-                  inputRef={(el) => { fileInputRefs.current["modelo-peq2"] = el; }}
-                />
+                <ImagePicker url={content.modelo.imagePequena2} onPick={(f) => uploadImage(f, "modelo-peq2")} onChange={(url) => update("modelo", { ...content.modelo, imagePequena2: url })} inputRef={(el) => { fileInputRefs.current["modelo-peq2"] = el; }} />
               </Field>
+            </div>
+          )}
+
+          {tab === "tema" && (
+            <div className="space-y-6">
+              <p className="text-body-md text-[#444748]">Personaliza los colores principales. Los cambios se aplican al guardar.</p>
+              <Field label="Color de fondo">
+                <ColorPicker value={content.theme.bg} onChange={(v) => update("theme", { ...content.theme, bg: v })} />
+              </Field>
+              <Field label="Color de texto principal">
+                <ColorPicker value={content.theme.text} onChange={(v) => update("theme", { ...content.theme, text: v })} />
+              </Field>
+              <Field label="Color primario (negro)">
+                <ColorPicker value={content.theme.primary} onChange={(v) => update("theme", { ...content.theme, primary: v })} />
+              </Field>
+              <Field label="Color de WhatsApp">
+                <ColorPicker value={content.theme.whatsapp} onChange={(v) => update("theme", { ...content.theme, whatsapp: v })} />
+              </Field>
+            </div>
+          )}
+
+          {tab === "newsletter" && (
+            <div className="space-y-6">
+              <Field label="Título">
+                <input type="text" value={content.newsletter.title} onChange={(e) => update("newsletter", { ...content.newsletter, title: e.target.value })} className="bb-input" />
+              </Field>
+              <Field label="Subtítulo">
+                <textarea value={content.newsletter.subtitle} onChange={(e) => update("newsletter", { ...content.newsletter, subtitle: e.target.value })} className="bb-input min-h-[60px]" />
+              </Field>
+              <Field label="Texto del botón">
+                <input type="text" value={content.newsletter.buttonText} onChange={(e) => update("newsletter", { ...content.newsletter, buttonText: e.target.value })} className="bb-input" />
+              </Field>
+              <LeadsList />
             </div>
           )}
 
@@ -403,7 +469,70 @@ export function AdminPanel({
   );
 }
 
-// ─── Orders Tab ───────────────────────────────────────────────────────
+// ─── Sub-components ──────────────────────────────────────────────────
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="block text-label-caps text-[#444748] uppercase mb-2">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function ImagePicker({ url, onPick, onChange, inputRef }: { url: string; onPick: (file: File) => void; onChange: (url: string) => void; inputRef: (el: HTMLInputElement | null) => void; }) {
+  return (
+    <div className="space-y-3">
+      <div className="w-full aspect-[3/4] max-w-[200px] bg-[#eeeeee] overflow-hidden border border-[#c4c7c7]">
+        {url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={url} alt="Preview" className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-[#999] text-sm">Sin imagen</div>
+        )}
+      </div>
+      <input type="text" value={url} onChange={(e) => onChange(e.target.value)} placeholder="/products/imagen.png o https://..." className="bb-input" />
+      <input type="file" accept="image/*" ref={inputRef} onChange={(e) => { const file = e.target.files?.[0]; if (file) onPick(file); }} className="hidden" />
+      <button onClick={() => inputRef(null)?.click()} className="text-button uppercase text-black border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors">
+        Subir imagen
+      </button>
+    </div>
+  );
+}
+
+function ColorPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="flex items-center gap-3">
+      <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="w-12 h-12 border border-[#c4c7c7] cursor-pointer" />
+      <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className="bb-input flex-1" />
+    </div>
+  );
+}
+
+// ─── Orders Tab ──────────────────────────────────────────────────────
+type OrderStatus = "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
+const ORDER_STATUSES: { value: OrderStatus; label: string; color: string }[] = [
+  { value: "pending", label: "Pendiente", color: "#a9a9a9" },
+  { value: "confirmed", label: "Confirmado", color: "#1F3C88" },
+  { value: "shipped", label: "Enviado", color: "#C9A961" },
+  { value: "delivered", label: "Entregado", color: "#2ECC71" },
+  { value: "cancelled", label: "Cancelado", color: "#ba1a1a" },
+];
+
+type OrderRow = {
+  id: string;
+  customer_name: string | null;
+  customer_phone: string;
+  product_name: string;
+  product_price: string;
+  size: string | null;
+  quantity: number;
+  status: OrderStatus;
+  total: string;
+  notes: string | null;
+  source: string | null;
+  created_at: string;
+};
+
 function OrdersTab() {
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -423,20 +552,14 @@ function OrdersTab() {
     }
   };
 
-  useEffect(() => {
-    load();
-  }, [filter]);
+  useEffect(() => { load(); }, [filter]);
 
   const updateStatus = async (id: string, status: OrderStatus) => {
     try {
-      await fetch(`/api/orders/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
+      await fetch(`/api/orders/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
       load();
     } catch (e) {
-      alert("Error al actualizar: " + (e as Error).message);
+      alert("Error: " + (e as Error).message);
     }
   };
 
@@ -446,59 +569,33 @@ function OrdersTab() {
       await fetch(`/api/orders/${id}`, { method: "DELETE" });
       load();
     } catch (e) {
-      alert("Error al eliminar: " + (e as Error).message);
+      alert("Error: " + (e as Error).message);
     }
   };
 
   const fmtDate = (s: string) => {
     try {
-      return new Date(s).toLocaleString("es-PE", {
-        day: "2-digit",
-        month: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+      return new Date(s).toLocaleString("es-PE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
     } catch {
       return s;
     }
   };
 
-  if (loading) {
-    return <div className="text-body-md text-[#444748]">Cargando pedidos...</div>;
-  }
+  if (loading) return <div className="text-body-md text-[#444748]">Cargando pedidos...</div>;
 
   return (
     <div className="space-y-6">
-      {/* Filtros */}
-      <div className="flex flex-wrap gap-2">
-        <button
-          onClick={() => setFilter("all")}
-          className={`px-4 py-2 text-button uppercase ${filter === "all" ? "bg-black text-white" : "bg-white border border-[#c4c7c7] text-black hover:border-black"}`}
-        >
-          Todos ({orders.length})
-        </button>
+      <div className="flex flex-wrap gap-2 items-center">
+        <button onClick={() => setFilter("all")} className={`px-4 py-2 text-button uppercase ${filter === "all" ? "bg-black text-white" : "bg-white border border-[#c4c7c7] text-black hover:border-black"}`}>Todos ({orders.length})</button>
         {ORDER_STATUSES.map((s) => (
-          <button
-            key={s.value}
-            onClick={() => setFilter(s.value)}
-            className={`px-4 py-2 text-button uppercase ${filter === s.value ? "bg-black text-white" : "bg-white border border-[#c4c7c7] text-black hover:border-black"}`}
-          >
-            {s.label}
-          </button>
+          <button key={s.value} onClick={() => setFilter(s.value)} className={`px-4 py-2 text-button uppercase ${filter === s.value ? "bg-black text-white" : "bg-white border border-[#c4c7c7] text-black hover:border-black"}`}>{s.label}</button>
         ))}
-        <button
-          onClick={load}
-          className="ml-auto px-4 py-2 text-button uppercase bg-[#25D366] text-white hover:bg-[#1FB855]"
-        >
-          <span className="material-symbols-outlined text-sm align-middle">refresh</span>{" "}
-          Refrescar
-        </button>
+        <button onClick={load} className="ml-auto px-4 py-2 text-button uppercase bg-[#25D366] text-white hover:bg-[#1FB855]">Refrescar</button>
       </div>
 
-      {/* Lista */}
       {orders.length === 0 ? (
         <div className="bg-white p-8 border border-[#c4c7c7] text-center text-body-md text-[#444748]">
-          No hay pedidos aún. Cuando alguien haga clic en un botón de WhatsApp en la landing, aparecerá aquí.
+          No hay pedidos en este filtro.
         </div>
       ) : (
         <div className="space-y-3">
@@ -509,24 +606,13 @@ function OrdersTab() {
                 <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span
-                        className="text-label-caps px-2 py-0.5 uppercase"
-                        style={{ backgroundColor: statusMeta.color, color: "white" }}
-                      >
-                        {statusMeta.label}
-                      </span>
+                      <span className="text-label-caps px-2 py-0.5 uppercase text-white" style={{ backgroundColor: statusMeta.color }}>{statusMeta.label}</span>
+                      {o.source && <span className="text-label-caps text-[#999] uppercase">{o.source}</span>}
                       <span className="text-label-caps text-[#666]">{fmtDate(o.created_at)}</span>
                     </div>
-                    <div className="text-body-md font-medium text-black">
-                      {o.product_name} × {o.quantity}
-                      {o.size && <span className="text-[#666]"> · Talla {o.size}</span>}
-                    </div>
-                    <div className="text-body-md text-[#444748] mt-1">
-                      {o.customer_name || "Cliente desconocido"} · {o.customer_phone}
-                    </div>
-                    {o.notes && (
-                      <div className="text-sm text-[#666] mt-1 italic">{o.notes}</div>
-                    )}
+                    <div className="text-body-md font-medium text-black">{o.product_name} × {o.quantity}{o.size && <span className="text-[#666]"> · Talla {o.size}</span>}</div>
+                    <div className="text-body-md text-[#444748] mt-1">{o.customer_name || "Cliente pendiente"} · {o.customer_phone}</div>
+                    {o.notes && <div className="text-sm text-[#666] mt-1 italic">{o.notes}</div>}
                   </div>
                   <div className="text-right">
                     <div className="text-headline-lg text-black">{o.total}</div>
@@ -534,20 +620,9 @@ function OrdersTab() {
                 </div>
                 <div className="flex flex-wrap gap-2 pt-3 border-t border-[#c4c7c7]">
                   {ORDER_STATUSES.map((s) => (
-                    <button
-                      key={s.value}
-                      onClick={() => updateStatus(o.id, s.value)}
-                      className={`px-3 py-1.5 text-label-caps uppercase ${o.status === s.value ? "bg-black text-white" : "bg-[#f3f3f3] text-black hover:bg-[#e8e8e8]"}`}
-                    >
-                      {s.label}
-                    </button>
+                    <button key={s.value} onClick={() => updateStatus(o.id, s.value)} className={`px-3 py-1.5 text-label-caps uppercase ${o.status === s.value ? "bg-black text-white" : "bg-[#f3f3f3] text-black hover:bg-[#e8e8e8]"}`}>{s.label}</button>
                   ))}
-                  <button
-                    onClick={() => deleteOrder(o.id)}
-                    className="ml-auto px-3 py-1.5 text-label-caps uppercase text-red-600 hover:bg-red-50"
-                  >
-                    Eliminar
-                  </button>
+                  <button onClick={() => deleteOrder(o.id)} className="ml-auto px-3 py-1.5 text-label-caps uppercase text-red-600 hover:bg-red-50">Eliminar</button>
                 </div>
               </div>
             );
@@ -558,55 +633,36 @@ function OrdersTab() {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+// ─── Leads list (inside Newsletter tab) ──────────────────────────────
+function LeadsList() {
+  const [leads, setLeads] = useState<{ id: string; email: string; source: string; createdAt: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/leads", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((j) => setLeads(j.leads || []))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="text-body-md text-[#444748]">Cargando suscriptores...</div>;
+
   return (
     <div>
-      <label className="block text-label-caps text-[#444748] uppercase mb-2">{label}</label>
-      {children}
-    </div>
-  );
-}
-
-function ImagePicker({
-  url,
-  onPick,
-  onChange,
-  inputRef,
-}: {
-  url: string;
-  onPick: (file: File) => void;
-  onChange: (url: string) => void;
-  inputRef: (el: HTMLInputElement | null) => void;
-}) {
-  return (
-    <div className="space-y-3">
-      <div className="w-full aspect-[3/4] max-w-[200px] bg-[#eeeeee] overflow-hidden border border-[#c4c7c7]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={url} alt="Preview" className="w-full h-full object-cover" />
-      </div>
-      <input
-        type="text"
-        value={url}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="/products/imagen.png o https://..."
-        className="bb-input"
-      />
-      <input
-        type="file"
-        accept="image/*"
-        ref={inputRef}
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) onPick(file);
-        }}
-        className="hidden"
-      />
-      <button
-        onClick={() => inputRef(null)?.click()}
-        className="text-button uppercase text-black border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors"
-      >
-        Subir imagen
-      </button>
+      <h4 className="text-headline-lg text-black mb-3">Suscriptores ({leads.length})</h4>
+      {leads.length === 0 ? (
+        <p className="text-body-md text-[#444748]">Aún no hay suscriptores.</p>
+      ) : (
+        <div className="bg-white border border-[#c4c7c7] max-h-96 overflow-y-auto">
+          {leads.map((l) => (
+            <div key={l.id} className="px-4 py-3 border-b border-[#eee] last:border-0 flex items-center justify-between">
+              <span className="text-body-md text-black">{l.email}</span>
+              <span className="text-label-caps text-[#666] uppercase">{new Date(l.createdAt).toLocaleDateString("es-PE")}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
