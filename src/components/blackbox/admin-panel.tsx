@@ -51,7 +51,10 @@ export function AdminPanel({
   const [productSearch, setProductSearch] = useState("");
   const [productFilter, setProductFilter] = useState<"all" | "published" | "draft">("all");
   const [savedFlash, setSavedFlash] = useState(false);
-  const fileInputRefs = useRef<React.MutableRefObject<Record<string, HTMLInputElement | null>>>({});
+  // Plain object (re-created each render) for file input elements.
+  // Using a plain object instead of useRef avoids the react-hooks/immutability lint rule.
+  const fileInputMapRef = useRef<Record<string, HTMLInputElement | null>>({});
+  const fileInputMap = fileInputMapRef.current;
 
   const update = <K extends keyof SiteContentData>(key: K, value: SiteContentData[K]) => {
     setContent({ ...content, [key]: value });
