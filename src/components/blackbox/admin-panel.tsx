@@ -255,7 +255,7 @@ export function AdminPanel({
                 <input type="text" value={content.hero.ctaText} onChange={(e) => update("hero", { ...content.hero, ctaText: e.target.value })} className="bb-input" />
               </Field>
               <Field label="Imagen de fondo">
-                <ImagePicker url={content.hero.backgroundImage} onPick={(f) => uploadImage(f, "hero")} onChange={(url) => update("hero", { ...content.hero, backgroundImage: url })} inputRef={(el) => { fileInputMap["hero"] = el; }} />
+                <ImagePicker url={content.hero.backgroundImage} onPick={(f) => uploadImage(f, "hero")} onChange={(url) => update("hero", { ...content.hero, backgroundImage: url })} inputRef={(el) => { fileInputMap["hero"] = el; }} dimensions="1440 × 1920 px (vertical)" aspect="3/4" />
               </Field>
             </div>
           )}
@@ -371,13 +371,13 @@ export function AdminPanel({
           {tab === "modelo" && (
             <div className="space-y-6">
               <Field label="Imagen grande (calle)">
-                <ImagePicker url={content.modelo.imageGrande} onPick={(f) => uploadImage(f, "modelo-grande")} onChange={(url) => update("modelo", { ...content.modelo, imageGrande: url })} inputRef={(el) => { fileInputMap["modelo-grande"] = el; }} />
+                <ImagePicker url={content.modelo.imageGrande} onPick={(f) => uploadImage(f, "modelo-grande")} onChange={(url) => update("modelo", { ...content.modelo, imageGrande: url })} inputRef={(el) => { fileInputMap["modelo-grande"] = el; }} dimensions="1200 × 1600 px (vertical)" aspect="3/4" />
               </Field>
               <Field label="Imagen pequeña 1 (cuello)">
-                <ImagePicker url={content.modelo.imagePequena1} onPick={(f) => uploadImage(f, "modelo-peq1")} onChange={(url) => update("modelo", { ...content.modelo, imagePequena1: url })} inputRef={(el) => { fileInputMap["modelo-peq1"] = el; }} />
+                <ImagePicker url={content.modelo.imagePequena1} onPick={(f) => uploadImage(f, "modelo-peq1")} onChange={(url) => update("modelo", { ...content.modelo, imagePequena1: url })} inputRef={(el) => { fileInputMap["modelo-peq1"] = el; }} dimensions="800 × 800 px (cuadrada)" aspect="1/1" />
               </Field>
               <Field label="Imagen pequeña 2 (espalda)">
-                <ImagePicker url={content.modelo.imagePequena2} onPick={(f) => uploadImage(f, "modelo-peq2")} onChange={(url) => update("modelo", { ...content.modelo, imagePequena2: url })} inputRef={(el) => { fileInputMap["modelo-peq2"] = el; }} />
+                <ImagePicker url={content.modelo.imagePequena2} onPick={(f) => uploadImage(f, "modelo-peq2")} onChange={(url) => update("modelo", { ...content.modelo, imagePequena2: url })} inputRef={(el) => { fileInputMap["modelo-peq2"] = el; }} dimensions="800 × 800 px (cuadrada)" aspect="1/1" />
               </Field>
             </div>
           )}
@@ -703,10 +703,10 @@ function ProductEditor({
         <h4 className="text-headline-lg text-black">Imágenes</h4>
         <div className="grid grid-cols-2 gap-6">
           <Field label="Imagen frontal">
-            <ImagePicker url={product.image} onPick={(f) => uploadImage(f, `product-${product.id}`)} onChange={(url) => onChange({ image: url })} inputRef={(el) => { fileInputRefs[`product-${product.id}`] = el; }} />
+            <ImagePicker url={product.image} onPick={(f) => uploadImage(f, `product-${product.id}`)} onChange={(url) => onChange({ image: url })} inputRef={(el) => { fileInputRefs[`product-${product.id}`] = el; }} dimensions="1200 × 1600 px (vertical 3:4)" aspect="3/4" />
           </Field>
           <Field label="Imagen espalda (opcional)">
-            <ImagePicker url={product.backImage || ""} onPick={(f) => uploadImage(f, `product-back-${product.id}`)} onChange={(url) => onChange({ backImage: url })} inputRef={(el) => { fileInputRefs[`product-back-${product.id}`] = el; }} />
+            <ImagePicker url={product.backImage || ""} onPick={(f) => uploadImage(f, `product-back-${product.id}`)} onChange={(url) => onChange({ backImage: url })} inputRef={(el) => { fileInputRefs[`product-back-${product.id}`] = el; }} dimensions="1200 × 1600 px (vertical 3:4)" aspect="3/4" />
           </Field>
         </div>
       </div>
@@ -800,7 +800,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function ImagePicker({ url, onPick, onChange, inputRef }: { url: string; onPick: (file: File) => void; onChange: (url: string) => void; inputRef: (el: HTMLInputElement | null) => void; }) {
+function ImagePicker({ url, onPick, onChange, inputRef, dimensions, aspect = "3/4" }: { url: string; onPick: (file: File) => void; onChange: (url: string) => void; inputRef: (el: HTMLInputElement | null) => void; dimensions?: string; aspect?: string; }) {
   const internalRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -825,7 +825,7 @@ function ImagePicker({ url, onPick, onChange, inputRef }: { url: string; onPick:
 
   return (
     <div className="space-y-3">
-      <div className="w-full aspect-[3/4] max-w-[200px] bg-[#eeeeee] overflow-hidden border border-[#c4c7c7] relative">
+      <div className="w-full bg-[#eeeeee] overflow-hidden border border-[#c4c7c7] relative" style={{ aspectRatio: aspect, maxWidth: "200px" }}>
         {uploading ? (
           <div className="w-full h-full flex flex-col items-center justify-center text-black text-sm gap-2">
             <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
@@ -838,6 +838,17 @@ function ImagePicker({ url, onPick, onChange, inputRef }: { url: string; onPick:
           <div className="w-full h-full flex items-center justify-center text-[#999] text-sm">Sin imagen</div>
         )}
       </div>
+
+      {/* Indicador de dimensiones recomendadas */}
+      {dimensions && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-[#1F3C88]/10 border border-[#1F3C88]/30 text-xs">
+          <span className="material-symbols-outlined text-base text-[#1F3C88]">aspect_ratio</span>
+          <div>
+            <div className="text-[#1F3C88] font-medium">Tamaño recomendado: {dimensions}</div>
+            <div className="text-[#666]">Formato: JPG o WebP · Máx 500KB</div>
+          </div>
+        </div>
+      )}
 
       {error && (
         <p className="text-xs text-red-600">⚠ {error}</p>
