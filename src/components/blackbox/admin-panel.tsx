@@ -505,7 +505,7 @@ function ProductsTab({
         onBack={() => setEditingProductId(null)}
         onTogglePublished={() => updateProduct(editingProduct.id, { published: !editingProduct.published })}
         uploadImage={uploadImage}
-        fileInputRefs={fileInputMap}
+        fileInputRefs={fileInputRefs}
       />
     );
   }
@@ -1378,4 +1378,3 @@ function LeadsList() {
     </div>
   );
 }
-// Cache bust: 1782966223
