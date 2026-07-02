@@ -120,7 +120,7 @@ export const defaultContent: SiteContentData = {
     subtitle:
       "Polos premium diseñados en Perú para potenciar tu estilo, confianza y fit diario.",
     ctaText: "Comprar por WhatsApp",
-    backgroundImage: "/products/hero-v3.png",
+    backgroundImage: "/products/hero-v4.png",
   },
   filosofia: {
     label: "Nuestra Filosofía",

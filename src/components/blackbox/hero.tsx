@@ -21,7 +21,7 @@ export function Hero({ content }: { content: SiteContentData }) {
     >
       <div className="absolute inset-0 z-0">
         <div
-          className="bg-cover bg-top md:bg-center w-full h-[120%] absolute top-0 left-0 right-0"
+          className="bg-cover bg-top w-full h-[120%] absolute top-0 left-0 right-0"
           style={{
             backgroundImage: `url('${hero.backgroundImage}')`,
             transform: `translateY(${scrollY * 0.15}px)`,
