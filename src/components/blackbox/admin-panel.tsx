@@ -503,31 +503,66 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function ImagePicker({ url, onPick, onChange, inputRef }: { url: string; onPick: (file: File) => void; onChange: (url: string) => void; inputRef: (el: HTMLInputElement | null) => void; }) {
   const internalRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  const handlePick = async (file: File) => {
+    setUploading(true);
+    setError(null);
+    try {
+      await onPick(file);
+      // Force image reload after upload
+      setTimeout(() => setReloadKey((k) => k + 1), 500);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Add cache-buster to URL when it's a Supabase URL to force reload
+  const displayUrl = url && url.includes("supabase.co") ? `${url}${url.includes("?") ? "&" : "?"}t=${reloadKey}` : url;
+
   return (
     <div className="space-y-3">
-      <div className="w-full aspect-[3/4] max-w-[200px] bg-[#eeeeee] overflow-hidden border border-[#c4c7c7]">
-        {url ? (
+      <div className="w-full aspect-[3/4] max-w-[200px] bg-[#eeeeee] overflow-hidden border border-[#c4c7c7] relative">
+        {uploading ? (
+          <div className="w-full h-full flex flex-col items-center justify-center text-black text-sm gap-2">
+            <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
+            <span>Subiendo...</span>
+          </div>
+        ) : displayUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt="Preview" className="w-full h-full object-cover" />
+          <img key={reloadKey} src={displayUrl} alt="Preview" className="w-full h-full object-cover" onError={() => setError("No se pudo cargar la imagen")} />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-[#999] text-sm">Sin imagen</div>
         )}
       </div>
-      <input type="text" value={url} onChange={(e) => onChange(e.target.value)} placeholder="/products/imagen.png o https://..." className="bb-input" />
+
+      {error && (
+        <p className="text-xs text-red-600">⚠ {error}</p>
+      )}
+
+      <input type="text" value={url} onChange={(e) => onChange(e.target.value)} placeholder="/products/imagen.png o https://..." className="bb-input" disabled={uploading} />
       <input
         type="file"
         accept="image/*"
         ref={(el) => { internalRef.current = el; inputRef(el); }}
-        onChange={(e) => { const file = e.target.files?.[0]; if (file) onPick(file); }}
+        onChange={(e) => { const file = e.target.files?.[0]; if (file) handlePick(file); }}
         className="hidden"
       />
       <button
         type="button"
         onClick={() => internalRef.current?.click()}
-        className="text-button uppercase text-black border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors"
+        disabled={uploading}
+        className="text-button uppercase text-black border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors disabled:opacity-50"
       >
-        Subir imagen
+        {uploading ? "Subiendo..." : "Subir imagen"}
       </button>
+      {url && url.includes("supabase.co") && !uploading && (
+        <p className="text-xs text-[#25D366]">✓ Imagen subida a la nube</p>
+      )}
     </div>
   );
 }
