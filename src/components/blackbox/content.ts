@@ -18,6 +18,7 @@ export type EditableProduct = {
   stock: Record<string, number>; // size -> qty
   backImage?: string;
   detailImage?: string;
+  published: boolean; // NUEVO: si está publicado en la web pública
 };
 
 export type EditableBenefit = {
@@ -145,6 +146,7 @@ export const defaultContent: SiteContentData = {
       care: "Lavar en frío · Secar a la sombra · Planchar del revés",
       sizes: ["S", "M", "L", "XL", "XXL"],
       stock: { S: 15, M: 25, L: 30, XL: 20, XXL: 10 },
+      published: true,
     },
     {
       id: "002",
@@ -161,6 +163,7 @@ export const defaultContent: SiteContentData = {
       care: "Lavar en frío · Secar a la sombra · No usar blanqueador",
       sizes: ["S", "M", "L", "XL", "XXL"],
       stock: { S: 12, M: 20, L: 28, XL: 18, XXL: 8 },
+      published: true,
     },
     {
       id: "003",
@@ -177,6 +180,7 @@ export const defaultContent: SiteContentData = {
       care: "Lavar en frío · Secar a la sombra · Planchar del revés",
       sizes: ["S", "M", "L", "XL", "XXL"],
       stock: { S: 10, M: 22, L: 28, XL: 15, XXL: 12 },
+      published: true,
     },
   ],
   beneficios: [

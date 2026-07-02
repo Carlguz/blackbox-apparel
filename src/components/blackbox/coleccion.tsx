@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 
 export function Coleccion({ content }: { content: SiteContentData }) {
   const { coleccion, products, whatsappNumber } = content;
+  const visibleProducts = products.filter((p) => p.published !== false);
   return (
     <section id="coleccion" className="py-[120px] px-5 md:px-12 max-w-[1440px] mx-auto">
       <div className="flex justify-between items-end mb-16">
@@ -13,7 +14,7 @@ export function Coleccion({ content }: { content: SiteContentData }) {
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {products.map((product) => {
+        {visibleProducts.map((product) => {
           const totalStock = Object.values(product.stock || {}).reduce((a, b) => a + b, 0);
           const lowStock = totalStock > 0 && totalStock < 30;
           return (

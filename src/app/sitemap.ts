@@ -17,12 +17,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: baseUrl, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
   ];
 
-  const productRoutes: MetadataRoute.Sitemap = content.products.map((p) => ({
-    url: `${baseUrl}/producto/${p.id}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly",
-    priority: 0.8,
-  }));
+  const productRoutes: MetadataRoute.Sitemap = content.products
+    .filter((p) => p.published !== false)
+    .map((p) => ({
+      url: `${baseUrl}/producto/${p.id}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    }));
 
   return [...staticRoutes, ...productRoutes];
 }

@@ -47,8 +47,11 @@ export function AdminPanel({
   onClose: () => void;
 }) {
   const [tab, setTab] = useState<Tab>("dashboard");
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [productSearch, setProductSearch] = useState("");
+  const [productFilter, setProductFilter] = useState<"all" | "published" | "draft">("all");
   const [savedFlash, setSavedFlash] = useState(false);
-  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const fileInputRefs = useRef<React.MutableRefObject<Record<string, HTMLInputElement | null>>>({});
 
   const update = <K extends keyof SiteContentData>(key: K, value: SiteContentData[K]) => {
     setContent({ ...content, [key]: value });
@@ -106,14 +109,28 @@ export function AdminPanel({
       care: "Lavar en frío · Secar a la sombra",
       sizes: ["S", "M", "L", "XL", "XXL"],
       stock: { S: 10, M: 10, L: 10, XL: 10, XXL: 10 },
+      published: false,
     };
     update("products", [...content.products, newProduct]);
+    setEditingProductId(newId);
   };
   const removeProduct = (id: string) => {
     update("products", content.products.filter((p) => p.id !== id));
   };
   const updateProduct = (id: string, patch: Partial<EditableProduct>) => {
     update("products", content.products.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+  };
+  const duplicateProduct = (id: string) => {
+    const orig = content.products.find((p) => p.id === id);
+    if (!orig) return;
+    const newId = String(Date.now()).slice(-6);
+    const copy: EditableProduct = {
+      ...orig,
+      id: newId,
+      name: `${orig.name} (copia)`,
+      published: false,
+    };
+    update("products", [...content.products, copy]);
   };
 
   const addBenefit = () => {
@@ -235,7 +252,7 @@ export function AdminPanel({
                 <input type="text" value={content.hero.ctaText} onChange={(e) => update("hero", { ...content.hero, ctaText: e.target.value })} className="bb-input" />
               </Field>
               <Field label="Imagen de fondo">
-                <ImagePicker url={content.hero.backgroundImage} onPick={(f) => uploadImage(f, "hero")} onChange={(url) => update("hero", { ...content.hero, backgroundImage: url })} inputRef={(el) => { fileInputRefs.current["hero"] = el; }} />
+                <ImagePicker url={content.hero.backgroundImage} onPick={(f) => uploadImage(f, "hero")} onChange={(url) => update("hero", { ...content.hero, backgroundImage: url })} inputRef={(el) => { fileInputMap["hero"] = el; }} />
               </Field>
             </div>
           )}
@@ -263,69 +280,21 @@ export function AdminPanel({
           )}
 
           {tab === "productos" && (
-            <div className="space-y-8">
-              {content.products.map((p, idx) => (
-                <div key={p.id} className="bg-white p-6 border border-[#c4c7c7] space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-bold text-black">Producto {idx + 1}</h4>
-                    <button onClick={() => removeProduct(p.id)} className="text-sm text-red-600 hover:text-red-800">Eliminar</button>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Field label="Nombre">
-                      <input type="text" value={p.name} onChange={(e) => updateProduct(p.id, { name: e.target.value })} className="bb-input" />
-                    </Field>
-                    <Field label="Precio">
-                      <input type="text" value={p.price} onChange={(e) => updateProduct(p.id, { price: e.target.value })} className="bb-input" />
-                    </Field>
-                  </div>
-                  <Field label="Etiqueta (material/color)">
-                    <input type="text" value={p.label} onChange={(e) => updateProduct(p.id, { label: e.target.value })} className="bb-input" />
-                  </Field>
-                  <Field label="Descripción corta (landing)">
-                    <textarea value={p.description} onChange={(e) => updateProduct(p.id, { description: e.target.value })} className="bb-input min-h-[60px]" />
-                  </Field>
-                  <Field label="Historia (página de producto)">
-                    <textarea value={p.story} onChange={(e) => updateProduct(p.id, { story: e.target.value })} className="bb-input min-h-[80px]" />
-                  </Field>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Field label="Material">
-                      <input type="text" value={p.material} onChange={(e) => updateProduct(p.id, { material: e.target.value })} className="bb-input" />
-                    </Field>
-                    <Field label="Cuidados">
-                      <input type="text" value={p.care} onChange={(e) => updateProduct(p.id, { care: e.target.value })} className="bb-input" />
-                    </Field>
-                  </div>
-                  <Field label="Tallas disponibles">
-                    <div className="flex flex-wrap gap-2">
-                      {ALL_SIZES.map((s) => {
-                        const checked = p.sizes.includes(s);
-                        return (
-                          <button
-                            key={s}
-                            onClick={() => {
-                              const sizes = checked ? p.sizes.filter((x) => x !== s) : [...p.sizes, s];
-                              updateProduct(p.id, { sizes });
-                            }}
-                            className={`w-12 h-10 text-button font-medium border transition-all ${checked ? "bg-black text-white border-black" : "bg-white text-black border-[#c4c7c7]"}`}
-                          >
-                            {s}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </Field>
-                  <Field label="Imagen frontal">
-                    <ImagePicker url={p.image} onPick={(f) => uploadImage(f, `product-${p.id}`)} onChange={(url) => updateProduct(p.id, { image: url })} inputRef={(el) => { fileInputRefs.current[`product-${p.id}`] = el; }} />
-                  </Field>
-                  <Field label="Imagen espalda (opcional)">
-                    <ImagePicker url={p.backImage || ""} onPick={(f) => uploadImage(f, `product-back-${p.id}`)} onChange={(url) => updateProduct(p.id, { backImage: url })} inputRef={(el) => { fileInputRefs.current[`product-back-${p.id}`] = el; }} />
-                  </Field>
-                </div>
-              ))}
-              <button onClick={addProduct} className="w-full py-4 border-2 border-dashed border-[#c4c7c7] text-[#444748] hover:border-black hover:text-black transition-colors text-button uppercase">
-                + Agregar producto
-              </button>
-            </div>
+            <ProductsTab
+              content={content}
+              editingProductId={editingProductId}
+              setEditingProductId={setEditingProductId}
+              productSearch={productSearch}
+              setProductSearch={setProductSearch}
+              productFilter={productFilter}
+              setProductFilter={setProductFilter}
+              addProduct={addProduct}
+              removeProduct={removeProduct}
+              updateProduct={updateProduct}
+              duplicateProduct={duplicateProduct}
+              uploadImage={uploadImage}
+              fileInputRefs={fileInputMap}
+            />
           )}
 
           {tab === "stock" && (
@@ -399,13 +368,13 @@ export function AdminPanel({
           {tab === "modelo" && (
             <div className="space-y-6">
               <Field label="Imagen grande (calle)">
-                <ImagePicker url={content.modelo.imageGrande} onPick={(f) => uploadImage(f, "modelo-grande")} onChange={(url) => update("modelo", { ...content.modelo, imageGrande: url })} inputRef={(el) => { fileInputRefs.current["modelo-grande"] = el; }} />
+                <ImagePicker url={content.modelo.imageGrande} onPick={(f) => uploadImage(f, "modelo-grande")} onChange={(url) => update("modelo", { ...content.modelo, imageGrande: url })} inputRef={(el) => { fileInputMap["modelo-grande"] = el; }} />
               </Field>
               <Field label="Imagen pequeña 1 (cuello)">
-                <ImagePicker url={content.modelo.imagePequena1} onPick={(f) => uploadImage(f, "modelo-peq1")} onChange={(url) => update("modelo", { ...content.modelo, imagePequena1: url })} inputRef={(el) => { fileInputRefs.current["modelo-peq1"] = el; }} />
+                <ImagePicker url={content.modelo.imagePequena1} onPick={(f) => uploadImage(f, "modelo-peq1")} onChange={(url) => update("modelo", { ...content.modelo, imagePequena1: url })} inputRef={(el) => { fileInputMap["modelo-peq1"] = el; }} />
               </Field>
               <Field label="Imagen pequeña 2 (espalda)">
-                <ImagePicker url={content.modelo.imagePequena2} onPick={(f) => uploadImage(f, "modelo-peq2")} onChange={(url) => update("modelo", { ...content.modelo, imagePequena2: url })} inputRef={(el) => { fileInputRefs.current["modelo-peq2"] = el; }} />
+                <ImagePicker url={content.modelo.imagePequena2} onPick={(f) => uploadImage(f, "modelo-peq2")} onChange={(url) => update("modelo", { ...content.modelo, imagePequena2: url })} inputRef={(el) => { fileInputMap["modelo-peq2"] = el; }} />
               </Field>
             </div>
           )}
@@ -487,6 +456,333 @@ export function AdminPanel({
         }
         .bb-input:focus { border-color: #000000; }
       `}</style>
+    </div>
+  );
+}
+
+// ─── Products Tab (list + editor) ────────────────────────────────────
+function ProductsTab({
+  content,
+  editingProductId,
+  setEditingProductId,
+  productSearch,
+  setProductSearch,
+  productFilter,
+  setProductFilter,
+  addProduct,
+  removeProduct,
+  updateProduct,
+  duplicateProduct,
+  uploadImage,
+  fileInputRefs,
+}: {
+  content: SiteContentData;
+  editingProductId: string | null;
+  setEditingProductId: (id: string | null) => void;
+  productSearch: string;
+  setProductSearch: (s: string) => void;
+  productFilter: "all" | "published" | "draft";
+  setProductFilter: (f: "all" | "published" | "draft") => void;
+  addProduct: () => void;
+  removeProduct: (id: string) => void;
+  updateProduct: (id: string, patch: Partial<EditableProduct>) => void;
+  duplicateProduct: (id: string) => void;
+  uploadImage: (file: File, target: string) => Promise<void>;
+  fileInputRefs: Record<string, HTMLInputElement | null>;
+}) {
+  const editingProduct = editingProductId
+    ? content.products.find((p) => p.id === editingProductId)
+    : null;
+
+  if (editingProduct) {
+    return (
+      <ProductEditor
+        product={editingProduct}
+        onChange={(patch) => updateProduct(editingProduct.id, patch)}
+        onBack={() => setEditingProductId(null)}
+        onTogglePublished={() => updateProduct(editingProduct.id, { published: !editingProduct.published })}
+        uploadImage={uploadImage}
+        fileInputRefs={fileInputMap}
+      />
+    );
+  }
+
+  // Filtros + búsqueda
+  const filtered = content.products.filter((p) => {
+    const matchesSearch = !productSearch || p.name.toLowerCase().includes(productSearch.toLowerCase()) || p.label.toLowerCase().includes(productSearch.toLowerCase());
+    const matchesFilter =
+      productFilter === "all" ||
+      (productFilter === "published" && p.published) ||
+      (productFilter === "draft" && !p.published);
+    return matchesSearch && matchesFilter;
+  });
+
+  return (
+    <div className="space-y-4">
+      {/* Header con búsqueda y filtros */}
+      <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
+        <div className="flex-1 max-w-sm">
+          <input
+            type="text"
+            value={productSearch}
+            onChange={(e) => setProductSearch(e.target.value)}
+            placeholder="🔍 Buscar producto..."
+            className="bb-input"
+          />
+        </div>
+        <div className="flex gap-2">
+          {(["all", "published", "draft"] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => setProductFilter(f)}
+              className={`px-3 py-2 text-label-caps uppercase ${productFilter === f ? "bg-black text-white" : "bg-white border border-[#c4c7c7] text-black hover:border-black"}`}
+            >
+              {f === "all" ? `Todos (${content.products.length})` : f === "published" ? `Publicados (${content.products.filter((p) => p.published).length})` : `Borradores (${content.products.filter((p) => !p.published).length})`}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={addProduct}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[#25D366] text-white text-button uppercase tracking-wider hover:bg-[#1FB855] transition-colors"
+        >
+          <span className="material-symbols-outlined text-base">add</span>
+          Nuevo
+        </button>
+      </div>
+
+      {/* Lista de productos */}
+      {filtered.length === 0 ? (
+        <div className="bg-white p-8 border border-[#c4c7c7] text-center text-body-md text-[#444748]">
+          {content.products.length === 0
+            ? "Aún no tienes productos. Click en \"Nuevo\" para crear el primero."
+            : "No se encontraron productos con ese filtro."}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {filtered.map((p) => {
+            const totalStock = Object.values(p.stock || {}).reduce((a, b) => a + b, 0);
+            return (
+              <div key={p.id} className="bg-white border border-[#c4c7c7] hover:border-black transition-colors">
+                <div className="flex items-center gap-4 p-4">
+                  {/* Thumbnail */}
+                  <div className="w-16 h-20 bg-[#eeeeee] overflow-hidden flex-shrink-0">
+                    {p.image && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={p.image} alt={p.alt} className="w-full h-full object-cover" />
+                    )}
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="text-body-md font-medium text-black truncate">{p.name}</h4>
+                      <span
+                        className={`text-label-caps px-2 py-0.5 uppercase ${p.published ? "bg-[#25D366] text-white" : "bg-[#a9a9a9] text-white"}`}
+                      >
+                        {p.published ? "Publicado" : "Borrador"}
+                      </span>
+                    </div>
+                    <p className="text-label-caps text-[#666] uppercase truncate">{p.label}</p>
+                    <p className="text-xs text-[#999] mt-1">Stock total: {totalStock}u</p>
+                  </div>
+
+                  {/* Precio */}
+                  <div className="text-right flex-shrink-0">
+                    <div className="text-body-md font-medium text-black">{p.price}</div>
+                  </div>
+
+                  {/* Acciones */}
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <button
+                      onClick={() => setEditingProductId(p.id)}
+                      className="p-2 hover:bg-[#f3f3f3] text-black"
+                      title="Editar"
+                    >
+                      <span className="material-symbols-outlined text-base">edit</span>
+                    </button>
+                    <button
+                      onClick={() => updateProduct(p.id, { published: !p.published })}
+                      className="p-2 hover:bg-[#f3f3f3] text-black"
+                      title={p.published ? "Despublicar" : "Publicar"}
+                    >
+                      <span className="material-symbols-outlined text-base">{p.published ? "visibility_off" : "visibility"}</span>
+                    </button>
+                    <button
+                      onClick={() => duplicateProduct(p.id)}
+                      className="p-2 hover:bg-[#f3f3f3] text-black"
+                      title="Duplicar"
+                    >
+                      <span className="material-symbols-outlined text-base">content_copy</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm(`¿Eliminar "${p.name}"? Esta acción no se puede deshacer.`)) {
+                          removeProduct(p.id);
+                        }
+                      }}
+                      className="p-2 hover:bg-red-50 text-red-600"
+                      title="Eliminar"
+                    >
+                      <span className="material-symbols-outlined text-base">delete</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Product Editor (vista detalle) ─────────────────────────────────
+function ProductEditor({
+  product,
+  onChange,
+  onBack,
+  onTogglePublished,
+  uploadImage,
+  fileInputRefs,
+}: {
+  product: EditableProduct;
+  onChange: (patch: Partial<EditableProduct>) => void;
+  onBack: () => void;
+  onTogglePublished: () => void;
+  uploadImage: (file: File, target: string) => Promise<void>;
+  fileInputRefs: Record<string, HTMLInputElement | null>;
+}) {
+  const totalStock = Object.values(product.stock || {}).reduce((a, b) => a + b, 0);
+
+  return (
+    <div className="space-y-6">
+      {/* Header con volver + estado + guardar */}
+      <div className="flex items-center justify-between gap-3 pb-4 border-b border-[#c4c7c7]">
+        <button
+          onClick={onBack}
+          className="inline-flex items-center gap-2 text-label-caps uppercase text-[#444748] hover:text-black transition-colors"
+        >
+          <span className="material-symbols-outlined text-base">arrow_back</span>
+          Volver a lista
+        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onTogglePublished}
+            className={`inline-flex items-center gap-2 px-4 py-2 text-label-caps uppercase ${product.published ? "bg-[#25D366] text-white" : "bg-[#a9a9a9] text-white"}`}
+          >
+            <span className="material-symbols-outlined text-base">{product.published ? "visibility" : "visibility_off"}</span>
+            {product.published ? "Publicado" : "Borrador"}
+          </button>
+        </div>
+      </div>
+
+      {/* Información básica */}
+      <div className="bg-white p-6 border border-[#c4c7c7] space-y-4">
+        <h4 className="text-headline-lg text-black">Información básica</h4>
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Nombre">
+            <input type="text" value={product.name} onChange={(e) => onChange({ name: e.target.value })} className="bb-input" />
+          </Field>
+          <Field label="Precio">
+            <input type="text" value={product.price} onChange={(e) => onChange({ price: e.target.value })} className="bb-input" />
+          </Field>
+        </div>
+        <Field label="Etiqueta (material/color)">
+          <input type="text" value={product.label} onChange={(e) => onChange({ label: e.target.value })} className="bb-input" />
+        </Field>
+        <Field label="Descripción corta (landing)">
+          <textarea value={product.description} onChange={(e) => onChange({ description: e.target.value })} className="bb-input min-h-[60px]" />
+        </Field>
+      </div>
+
+      {/* Imágenes */}
+      <div className="bg-white p-6 border border-[#c4c7c7] space-y-4">
+        <h4 className="text-headline-lg text-black">Imágenes</h4>
+        <div className="grid grid-cols-2 gap-6">
+          <Field label="Imagen frontal">
+            <ImagePicker url={product.image} onPick={(f) => uploadImage(f, `product-${product.id}`)} onChange={(url) => onChange({ image: url })} inputRef={(el) => { fileInputMap[`product-${product.id}`] = el; }} />
+          </Field>
+          <Field label="Imagen espalda (opcional)">
+            <ImagePicker url={product.backImage || ""} onPick={(f) => uploadImage(f, `product-back-${product.id}`)} onChange={(url) => onChange({ backImage: url })} inputRef={(el) => { fileInputMap[`product-back-${product.id}`] = el; }} />
+          </Field>
+        </div>
+      </div>
+
+      {/* Inventario */}
+      <div className="bg-white p-6 border border-[#c4c7c7] space-y-4">
+        <div className="flex items-center justify-between">
+          <h4 className="text-headline-lg text-black">Inventario</h4>
+          <span className="text-label-caps text-[#666] uppercase">Stock total: {totalStock}u</span>
+        </div>
+        <Field label="Tallas disponibles">
+          <div className="flex flex-wrap gap-2">
+            {ALL_SIZES.map((s) => {
+              const checked = product.sizes.includes(s);
+              return (
+                <button
+                  key={s}
+                  onClick={() => {
+                    const sizes = checked ? product.sizes.filter((x) => x !== s) : [...product.sizes, s];
+                    onChange({ sizes });
+                  }}
+                  className={`w-12 h-10 text-button font-medium border transition-all ${checked ? "bg-black text-white border-black" : "bg-white text-black border-[#c4c7c7]"}`}
+                >
+                  {s}
+                </button>
+              );
+            })}
+          </div>
+        </Field>
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+          {ALL_SIZES.map((s) => {
+            const stock = product.stock?.[s] ?? 0;
+            const available = product.sizes.includes(s);
+            return (
+              <div key={s} className={`${!available ? "opacity-40" : ""}`}>
+                <div className="text-label-caps text-[#666] uppercase mb-1 text-center">{s}</div>
+                <input
+                  type="number"
+                  min={0}
+                  value={stock}
+                  disabled={!available}
+                  onChange={(e) => {
+                    const next = { ...product.stock, [s]: parseInt(e.target.value) || 0 };
+                    onChange({ stock: next });
+                  }}
+                  className="bb-input text-center"
+                />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Detalles extendidos */}
+      <div className="bg-white p-6 border border-[#c4c7c7] space-y-4">
+        <h4 className="text-headline-lg text-black">Detalles (página de producto)</h4>
+        <Field label="Historia">
+          <textarea value={product.story} onChange={(e) => onChange({ story: e.target.value })} className="bb-input min-h-[80px]" />
+        </Field>
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Material">
+            <input type="text" value={product.material} onChange={(e) => onChange({ material: e.target.value })} className="bb-input" />
+          </Field>
+          <Field label="Cuidados">
+            <input type="text" value={product.care} onChange={(e) => onChange({ care: e.target.value })} className="bb-input" />
+          </Field>
+        </div>
+      </div>
+
+      {/* Botón volver abajo */}
+      <div className="pt-4">
+        <button
+          onClick={onBack}
+          className="inline-flex items-center gap-2 px-4 py-2 text-label-caps uppercase text-black border border-black hover:bg-black hover:text-white transition-colors"
+        >
+          <span className="material-symbols-outlined text-base">arrow_back</span>
+          Volver a lista
+        </button>
+      </div>
     </div>
   );
 }
