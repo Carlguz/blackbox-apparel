@@ -703,10 +703,10 @@ function ProductEditor({
         <h4 className="text-headline-lg text-black">Imágenes</h4>
         <div className="grid grid-cols-2 gap-6">
           <Field label="Imagen frontal">
-            <ImagePicker url={product.image} onPick={(f) => uploadImage(f, `product-${product.id}`)} onChange={(url) => onChange({ image: url })} inputRef={(el) => { fileInputMap[`product-${product.id}`] = el; }} />
+            <ImagePicker url={product.image} onPick={(f) => uploadImage(f, `product-${product.id}`)} onChange={(url) => onChange({ image: url })} inputRef={(el) => { fileInputRefs[`product-${product.id}`] = el; }} />
           </Field>
           <Field label="Imagen espalda (opcional)">
-            <ImagePicker url={product.backImage || ""} onPick={(f) => uploadImage(f, `product-back-${product.id}`)} onChange={(url) => onChange({ backImage: url })} inputRef={(el) => { fileInputMap[`product-back-${product.id}`] = el; }} />
+            <ImagePicker url={product.backImage || ""} onPick={(f) => uploadImage(f, `product-back-${product.id}`)} onChange={(url) => onChange({ backImage: url })} inputRef={(el) => { fileInputRefs[`product-back-${product.id}`] = el; }} />
           </Field>
         </div>
       </div>
