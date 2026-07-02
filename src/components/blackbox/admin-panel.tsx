@@ -502,6 +502,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 function ImagePicker({ url, onPick, onChange, inputRef }: { url: string; onPick: (file: File) => void; onChange: (url: string) => void; inputRef: (el: HTMLInputElement | null) => void; }) {
+  const internalRef = useRef<HTMLInputElement>(null);
   return (
     <div className="space-y-3">
       <div className="w-full aspect-[3/4] max-w-[200px] bg-[#eeeeee] overflow-hidden border border-[#c4c7c7]">
@@ -513,8 +514,18 @@ function ImagePicker({ url, onPick, onChange, inputRef }: { url: string; onPick:
         )}
       </div>
       <input type="text" value={url} onChange={(e) => onChange(e.target.value)} placeholder="/products/imagen.png o https://..." className="bb-input" />
-      <input type="file" accept="image/*" ref={inputRef} onChange={(e) => { const file = e.target.files?.[0]; if (file) onPick(file); }} className="hidden" />
-      <button onClick={() => inputRef(null)?.click()} className="text-button uppercase text-black border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors">
+      <input
+        type="file"
+        accept="image/*"
+        ref={(el) => { internalRef.current = el; inputRef(el); }}
+        onChange={(e) => { const file = e.target.files?.[0]; if (file) onPick(file); }}
+        className="hidden"
+      />
+      <button
+        type="button"
+        onClick={() => internalRef.current?.click()}
+        className="text-button uppercase text-black border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors"
+      >
         Subir imagen
       </button>
     </div>
