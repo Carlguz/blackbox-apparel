@@ -15,35 +15,50 @@ export function Hero({ content }: { content: SiteContentData }) {
   const { hero, whatsappNumber } = content;
 
   return (
-    <section id="top" className="relative h-[921px] w-full overflow-hidden flex items-center pt-20">
+    <section
+      id="top"
+      className="relative min-h-[100svh] w-full overflow-hidden flex items-end md:items-center pb-24 md:pb-0 pt-20"
+    >
       <div className="absolute inset-0 z-0">
         <div
-          className="bg-cover bg-center w-full h-full"
+          className="bg-cover bg-top md:bg-center w-full h-[120%] absolute top-0 left-0 right-0"
           style={{
             backgroundImage: `url('${hero.backgroundImage}')`,
-            transform: `scale(1.05) translateY(${scrollY * 0.2}px)`,
+            transform: `translateY(${scrollY * 0.15}px)`,
+            willChange: "transform",
           }}
         />
-        <div className="absolute inset-0 bg-black/10" />
+        {/* Gradient overlays for readability - softer at top to not hide model's head */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
       </div>
+
       <div className="relative z-10 px-5 md:px-12 max-w-[1440px] mx-auto w-full">
         <div className="max-w-2xl">
-          <h1 className="text-display-lg md:text-display-lg text-white mb-6 leading-none font-semibold tracking-[-0.04em]">
+          <h1 className="text-display-lg-mobile md:text-display-lg text-white mb-6 leading-[0.95] font-semibold tracking-[-0.04em]">
             {hero.titleLine1}
             <br />
             {hero.titleLine2}
           </h1>
-          <p className="text-body-lg text-white/90 mb-10 max-w-lg">{hero.subtitle}</p>
+          <p className="text-body-lg text-white/90 mb-10 max-w-lg drop-shadow-lg">
+            {hero.subtitle}
+          </p>
           <a
             href={buildWhatsAppLink(whatsappNumber)}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 bg-[#25D366] text-white px-10 py-5 text-button uppercase tracking-wider transition-transform active:scale-95 shadow-xl hover:bg-[#1FB855]"
+            className="inline-flex items-center gap-3 bg-[#25D366] text-white px-10 py-5 text-button uppercase tracking-wider transition-transform active:scale-95 shadow-xl hover:bg-[#1FB855] hover:-translate-y-0.5"
           >
             <span className="material-symbols-outlined">chat</span>
             {hero.ctaText}
           </a>
         </div>
+      </div>
+
+      {/* Scroll indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 hidden md:flex flex-col items-center gap-2 text-white/70">
+        <span className="text-[10px] uppercase tracking-luxe">Scroll</span>
+        <div className="w-px h-10 bg-gradient-to-b from-white/70 to-transparent" />
       </div>
     </section>
   );
